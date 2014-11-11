@@ -9,38 +9,49 @@ app = Flask(__name__)
 # Restful api
 api = Api(app)
 
-""" Example usage """
 
 class SensorAPI(Resource):
-	""" Defines the api for a sensor:
-		GET /takonosu/api/sensor/<int:id>
-	"""
-	# Defines how will the json be.
+	""" Class for the Sensor resource. """
 	sensor_field = {
-	 'id' : fields.Integer,					# An integer field
-	 'name' : fields.String,				# A string
-	 'type' : fields.List(fields.String),	# List of strings
-	 'lastValue' : fields.Float,			# Float
-	 'retrievedAt' : fields.FormattedString("{hour}:{mins}:{secs}")	# Formated time
+		'name': fields.String,
+		'AD' : fields.String, # Analog or digital
+		'pin': fields.Integer, # To witch pin it is connected
+		'type': fields.String, # Read or write
+		'refresh': fields.Integer # Ignore if unnecessary
 	}
 
-	def __init_(self):
-		super(SensorAPI, self).__init__()
+class DataAPI(Resource):
+	""" Class to get data from a sensor. """
+	data_field = {
+		'value' : fields.Float,
+		'unit': fields.String
+	}
 
-	def get(self, id):
-		""" Handles  GET /takonosu/api/sensor/<int:id>"""
-		# sensor = some_method_doing_something_useful(id)
-		# Imagine that this sensor is real
-		time = datetime.now()
-		sensor = { 'id' : id, 'name' : 'DHT22',  'type' : ['Temperature', 'Humidity'],
-	 			   'lastValue' : 10.275, 'hour': time.strftime('%H'),
-	 			    'mins': time.strftime('%M'), 'secs': time.strftime('%S')  
-	 	}
-	 	return { 'sensor' : marshal(sensor, SensorAPI.sensor_field) }
+	def __init__(self):
+		self.reqparse = reqparse.RequestParser()
+		self.reqparse.add_argument('node', type=str, location='form',
+			required=True)
+		self.reqparse.add_argument('sensor', type=str, location='form',
+			required=True)
+		super(DataAPI, self).__init__()
 
-api.add_resource(SensorAPI, '/takonosu/api/sensor/<int:id>', endpoint='sensor')
+	def get(self):
+		args = self.reqparse.parse_args()
+		#ret = manager.get_value(args['node'], args['sensor'])
+		ret = {}
+		ret['value'] = 3.5
+		ret['unit'] = "C"
+		return {'data': marshal(ret, DataAPI.data_field)}
 
-""" End example """
+api.add_resource(DataAPI, '/takonosu/api/read')
+
+
+class NodeAPI(Resource):
+	""" Class for the Node resource. """
+	node_field = {
+		'name':fields.String,
+
+	}
 
 if __name__ == '__main__':
 	app.run(debug=True)

@@ -147,11 +147,8 @@ class NodeAPI(Resource):
 			return jsonify(message="DB error.", code=501)
 
 	def put(self):
-		""" Edit a
+		""" Edit a"""
+		pass
 
 
 api.add_resource(NodeAPI, '/takonosu/api/node')
-
-
-if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5000, debug=True)

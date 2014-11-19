@@ -1,4 +1,6 @@
 
+#Node resource
+
 * Obtain a node by its id:
   curl -X GET http://localhost:5000/takonosu/api/node -d "id=3"
   Response:
@@ -20,4 +22,31 @@
         	]
     	}
 	}
+
+* Create a new node:
+  curl -X POST http://localhost:5000/takonosu/api/node -d "board_type=Arduino" -d "name=SUPER NODEEEE" -d "nic=Wifi"
+  
+  Response success:
+  {
+    "node": {
+        "board_type": "Arduino", 
+        "id": 1, 
+        "name": "SUPER NODEEEE", 
+        "nic": "Wifi", 
+        "sensors": []
+    }
+  }
+
+  Response error:
+  {
+ 	 "code": 501, 
+ 	 "message": "DB error."
+  }
+
+* Modify an existing node:
+  curl -X POST http://localhost:5000/takonosu/api/node -d "id=1" -d "board_type=Arduino" -d "name=SUPER NODEEEE" -d "nic=Wifi"
+
+
+
+
 

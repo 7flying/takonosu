@@ -9,6 +9,7 @@ app = Flask(__name__)
 # Restful api
 api = Api(app)
 
+
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
 	data_field = {
@@ -99,6 +100,9 @@ class NodeAPI(Resource):
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
 		self.reqparse.add_argument('id', type=str, location='form')
+		self.reqparse.add_argument('name', type=str, location='form')
+		self.reqparse.add_argument('board_type', type=str, location='form')
+		self.reqparse.add_argument('nic', type=str, location='form')
 		super(NodeAPI, self).__init__()
 
 	def get(self):
@@ -124,8 +128,30 @@ class NodeAPI(Resource):
 		return {'node' : marshal(node, NodeAPI.node_field)}
 		#return jsonify(node=node)
 
+	def post(self):
+		""" Creates a new node."""
+		args = self.reqparse.parse_args()
+		node = {}
+		node['name'] = args['name']
+		node['board_type'] = args['board_type']
+		node['nic'] = args['nic']
+		#result = manager.create_node(args['name'], args['board_type'],
+		#	args['nic'])
+		result = 1
+		if result != -1:
+			node['id'] = result
+			node['sensors'] = []
+			#ret = manager.get_node(result)
+			return {'node': marshal(node, NodeAPI.node_field)}
+		else:
+			return jsonify(message="DB error.", code=501)
+
+	def put(self):
+		""" Edit a
+
+
 api.add_resource(NodeAPI, '/takonosu/api/node')
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host='0.0.0.0', port=5000, debug=True)

@@ -6,7 +6,7 @@ angular.module('flagular')
       id: '@id'
     },
     {
-      update: {
+      get: {
         method: 'GET',
         params: {
           id: 3

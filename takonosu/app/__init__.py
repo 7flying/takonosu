@@ -114,8 +114,6 @@ class NodeAPI(Resource):
 		args = self.reqparse.parse_args()
 		id = args['id']
 		node = {}
-		# node = manager.get_node(id) # Returns full node object + its sensors
-		node['id'] = id
 		node['name'] = "Super Node Zero"
 		node['board_type'] = "Arduino UNO"
 		node['nic'] = 'Bluetooth'
@@ -129,8 +127,17 @@ class NodeAPI(Resource):
 		sensor['refresh'] = 3000
 		sensors.append(sensor)
 		node['sensors'] = sensors
-		return {'node' : marshal(node, NodeAPI.node_field)}
-		#return jsonify(node=node)
+		if id == None:
+			nodes = []
+			id = 5
+			# node = manager.get_node(id) # Returns full node object + its sensors	
+			nodes.append(node)
+			nodes.append(node)
+			return jsonify(nodes= nodes)
+		else:
+			# node = manager.get_node(id) # Returns full node object + its sensors
+			node['id'] = id
+			return {'node' : marshal(node, NodeAPI.node_field)}
 
 	def post(self):
 		""" Creates a new node."""
@@ -152,6 +159,5 @@ class NodeAPI(Resource):
 
 	def put(self):
 		""" Edit a"""
-
 
 api.add_resource(NodeAPI, '/takonosu/api/node')

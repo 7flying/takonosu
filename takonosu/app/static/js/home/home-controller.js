@@ -1,9 +1,8 @@
 angular.module('flagular')
   .controller('HomeController', function ($scope, Node) {
   
-  Node.get({}).$promise.then(
+  Node.query().$promise.then(
     	function success(data) {
-    		$scope.node = data;		
+    		$scope.nodes = data.nodes;		
     	});
-
   });

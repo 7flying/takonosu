@@ -126,6 +126,7 @@ class NodeAPI(Resource):
 		sensor['type'] = 'R'
 		sensor['refresh'] = 3000
 		sensors.append(sensor)
+		sensors.append(sensor)
 		node['sensors'] = sensors
 		if id == None:
 			nodes = []

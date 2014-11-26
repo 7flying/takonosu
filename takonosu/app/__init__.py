@@ -9,10 +9,14 @@ from app.routes import index
 from datetime import datetime
 from flask import Flask, abort, jsonify, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
-
+import redis
+import manager
+from config import REDIS_HOST, REDIS_PORT, REDIS_DB
 # Restful api
 api = Api(app)
 
+# Redis database
+db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
@@ -159,6 +163,7 @@ class NodeAPI(Resource):
 			return jsonify(message="DB error.", code=501)
 
 	def put(self):
-		""" Edit a"""
+		""" Edit a Node."""
+
 
 api.add_resource(NodeAPI, '/takonosu/api/node')

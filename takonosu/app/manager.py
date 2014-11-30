@@ -71,12 +71,21 @@ def _increment_key_node():
 	ret = db.incr(KEY_AUTO_NODE_ID)
 	return str(ret)
 
+## Existence check ##
+
+def _does_sensor_exist(sensor_id):
+	pass
+
+def _does_node_exist(node_id):
+	pass
+
 ##  Nodes & Sensors ##
 
 def insert_node(node):
 	"""
 	Inserts a node into the db.
 	If the node has sensors they are also inserted.
+	Returns the new node's id
 	"""
 	id = _increment_key_node()
 	db.hset(KEY_NODES + id, N_ID, id)
@@ -86,6 +95,7 @@ def insert_node(node):
 	if node.get(N_SENSORS) != None:
 		for sensor in node[N_SENSORS]:
 			insert_sensor_to_node(id, sensor)
+	return id
 
 def delete_node(id):
 	"""
@@ -102,6 +112,7 @@ def modify_node(new_node):
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_NAME, new_node[N_NAME])
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_BOARD, new_node[N_BOARD])
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_NIC, new_node[N_NIC])
+	return True
 
 def get_node(node_id):
 	""" Returns the node given the id, as well as all its sensors. """
@@ -132,9 +143,9 @@ def _insert_sensor(sensor):
 	db.hset(KEY_SENSORS + id, S_ID, id)
 	db.hset(KEY_SENSORS + id, S_NAME, sensor[S_NAME])
 	db.hset(KEY_SENSORS + id, S_SIGNAL, sensor[S_SIGNAL])
-	db.hset(KEY_SENSORS + id, S_PIN, sensor[S_PIN])
+	db.hset(KEY_SENSORS + id, S_PIN, str(sensor[S_PIN]))
 	db.hset(KEY_SENSORS + id, S_DIRECTION, sensor[S_DIRECTION])
-	db.hset(KEY_SENSORS + id, S_REFRESH, sensor[S_REFRESH])
+	db.hset(KEY_SENSORS + id, S_REFRESH, str(sensor[S_REFRESH]))
 	return id
 
 def insert_sensor_to_node(node_id, sensor):
@@ -151,6 +162,6 @@ def modify_sensor(new_sensor):
 	""" Modifies the sensor's data."""
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_NAME, new_sensor[S_NAME])
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_SIGNAL, new_sensor[S_SIGNAL])
-	db.hset(KEY_SENSORS + new_sensor[S_ID], S_PIN, new_sensor[S_PIN])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_PIN, str(new_sensor[S_PIN])
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_DIRECTION, new_sensor[S_DIRECTION])
-	db.hset(KEY_SENSORS + new_sensor[S_ID], S_REFRESH, new_sensor[S_REFRESH])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_REFRESH, str(new_sensor[S_REFRESH])

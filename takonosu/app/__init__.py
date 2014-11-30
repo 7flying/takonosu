@@ -59,7 +59,7 @@ class DataAPI(Resource):
 		# response = someModule.send_data(args['node'], args['sensor'], args['data'])
 		return jsonify(message=response)
 
-api.add_resource(DataAPI, '/takonosu/api/data')
+api.add_resource(DataAPI, '/takonosu/api/data',endpoint='data')
 
 
 class SensorAPI(Resource):
@@ -67,32 +67,43 @@ class SensorAPI(Resource):
 	sensor_field = {
 		'id': fields.Integer,
 		'name': fields.String,
-		'AD' : fields.String, # Analog or digital
+		'signal' : fields.String, # Analog or digital
 		'pin': fields.Integer, # To witch pin it is connected
-		'type': fields.String, # Read or write
+		'direction': fields.String, # Read or write
 		'refresh': fields.Integer # Ignore if unnecessary
 	}
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('id', type=str, location='form')
+		self.reqparse.add_argument('id', type=int, required=True)
+		self.reqparse.add_argument('name', type=str)
+		self.reqparse.add_argument('signal', type=str)
+		self.reqparse.add_argument('pin', type=int)
+		self.reqparse.add_argument('direction', type=str)
+		self.reqparse.add_argument('refresh', type=int)
 		super(SensorAPI, self).__init__()
 
 	def get(self):
 		""" Gets a sensor given its id. """
 		args = self.reqparse.parse_args()
-		id = args['id']
-		# ret = manager.get_sensor(id)
-		ret = {}
-		ret['id'] = id
-		ret['name'] = 'TMP36'
-		ret['AD'] = 'D'
-		ret['pin'] = 5
-		ret['type'] = 'R'
-		ret['refresh'] = 3000
+		id = str(args['id'])
+		ret = manager.get_sensor(id)
 		return { 'sensor' : marshal(ret, SensorAPI.sensor_field)}
 
-api.add_resource(SensorAPI, '/takonosu/api/sensor')
+	def put(self):
+		""" Updates a sensor. """
+		sensor = {}
+		args = self.reqparse.parse_args()
+		sensor['id'] = args['id']
+		sensor['name'] = args['name']
+		sensor['signal'] = args['signal']
+		sensor['pin'] = args['pin']
+		sensor['direction'] = args['direction']
+		sensor['refresh'] = args['refresh']
+		manager.modify_sensor(sensor) # Boolean on the future
+		return jsonify(message="Sensor modified", code=201)
+
+api.add_resource(SensorAPI, '/takonosu/api/sensor', endpoint='sensor')
 
 
 class NodeAPI(Resource):
@@ -101,69 +112,105 @@ class NodeAPI(Resource):
 		'id': fields.Integer,
 		'name':fields.String,
 		'board_type': fields.String,
-		'nic': fields.String, # Tipo de comunicación
+		'nic': fields.String,
 		'sensors' : fields.List(fields.Nested(SensorAPI.sensor_field)) 
 	}
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('id', type=str, location='form')
-		self.reqparse.add_argument('name', type=str, location='form')
-		self.reqparse.add_argument('board_type', type=str, location='form')
-		self.reqparse.add_argument('nic', type=str, location='form')
+		self.reqparse.add_argument('id', type=int)
+		self.reqparse.add_argument('name', type=str)
+		self.reqparse.add_argument('board_type', type=str)
+		self.reqparse.add_argument('nic', type=str)
 		super(NodeAPI, self).__init__()
 
 	def get(self):
 		""" Returns a node by its id. """
-		args = self.reqparse.parse_args()
-		id = args['id']
-		node = {}
-		node['name'] = "Super Node Zero"
-		node['board_type'] = "Arduino UNO"
-		node['nic'] = 'Bluetooth'
-		sensors = []
-		sensor = {}
-		sensor['id'] = id
-		sensor['name'] = 'TMP36'
-		sensor['AD'] = 'D'
-		sensor['pin'] = 5
-		sensor['type'] = 'R'
-		sensor['refresh'] = 3000
-		sensors.append(sensor)
-		sensors.append(sensor)
-		node['sensors'] = sensors
-		if id == None:
-			nodes = []
-			id = 5
-			# node = manager.get_node(id) # Returns full node object + its sensors	
-			nodes.append(node)
-			nodes.append(node)
-			return jsonify(nodes= nodes)
-		else:
-			# node = manager.get_node(id) # Returns full node object + its sensors
-			node['id'] = id
+		args = self.reqparse,parse_args()
+		if args['id'] != None:
+			node = manager.get_node(args['id'])
 			return {'node' : marshal(node, NodeAPI.node_field)}
 
 	def post(self):
 		""" Creates a new node."""
 		args = self.reqparse.parse_args()
-		node = {}
-		node['name'] = args['name']
-		node['board_type'] = args['board_type']
-		node['nic'] = args['nic']
-		#result = manager.create_node(args['name'], args['board_type'],
-		#	args['nic'])
-		result = 1
-		if result != -1:
-			node['id'] = result
+		if args['id'] != None:
+			node = {}
+			node['name'] = args['name']
+			node['board_type'] = args['board_type']
+			node['nic'] = args['nic']
 			node['sensors'] = []
-			#ret = manager.get_node(result)
-			return {'node': marshal(node, NodeAPI.node_field)}
+			result = manager.insert_node(node)
+			created = manager.get_node(result)
+			return {'node' : marshal(created, NodeAPI.node_field)}
 		else:
-			return jsonify(message="DB error.", code=501)
+			abort(400)
 
 	def put(self):
 		""" Edit a Node."""
+		args = self.reqparse.parse_args()
+		if args['id'] != None:
+			node = {}
+			node['id'] = args['id']
+			node['name'] = args['name']
+			node['board_type'] = args['board_type']
+			node['nic'] = args['nic']
+			result = manager.modify_node(node)
+			if result:
+				return jsonify(message="Node modified", code=201)
+			else:
+				return jsonify(message="DB error on node modification", code=501)
+		else:
+			abort(400)
+
+	def delete(self):
+		""" Deletes a node and all its sensors. """
+		args = self.reqparse.parse_args()
+		if args['id'] != None:
+			manager.delete_node(args['id'])
+			return jsonify(message="Node deleted", code=201)
+		else:
+			abort(400)
+
+api.add_resource(NodeAPI, '/takonosu/api/node', endpoint='node')
 
 
-api.add_resource(NodeAPI, '/takonosu/api/node')
+class NodeSensorsAPI(Resource):
+	""" Class to interact with the sensors of a node. """
+
+	def __init__(self):
+		self.reqparse = reqparse.RequestParser()
+		self.reqparse.add_argument('sensor_id', type=int)
+		self.reqparse.add_argument('name', type=str)
+		self.reqparse.add_argument('signal', type=str)
+		self.reqparse.add_argument('pin', type=int)
+		self.reqparse.add_argument('direction', type=str)
+		self.reqparse.add_argument('refresh', type=int)
+		super(NodeSensorsAPI, self).__init__()
+
+	def get(self, id):
+		""" Gets all the sensors of a certain node. """
+		sensors = manager.get_sensors(id)
+		return jsonify(sensors=sensors)
+
+	def post(self, id):
+		""" Inserts a sensor to the node. """
+		args = reqparse.parse_args()
+		sensor = {}
+		sensor['name'] = args['name']
+		sensor['signal'] = args['signal']
+		sensor['pin'] = args['pin']
+		sensor['direction'] = args['direction']
+		sensor['refresh'] = args['refresh']
+		manager.insert_sensor_to_node(id, sensor)
+		return jsonify(message="Sensor inserted to node", code=201)
+
+	def delete(self, id):
+		""" Deletes a sensor from a node. """
+		args = reqparse.parse_args()
+		if args['sensor_id'] != None:
+			managet.delete_sensor_from_node(id, args['sensor_id'])
+			return jsonify(message="Sensor deleted from node", code=201)
+
+api.add_resource(NodeSensorsAPI, '/takonosu/api/node/<int:id>/sensors',
+	endpoint='sensors')

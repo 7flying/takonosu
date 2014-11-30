@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __init__ import db
-
+import random
 
 ## DB-Keys ##
 
@@ -33,46 +33,124 @@ S_REFRESH	= 'refresh'
 
 def populate():
 	""" Test data """
-	db.flush()
-	"""
-	node['name'] = "Super Node Zero"
-		node['board_type'] = "Arduino UNO"
-		node['nic'] = 'Bluetooth'
+	db.flushdb()
+	print "[ MANAGER ]: Inserting test data"
+	nic = ['Bluetooth', 'Wifi', 'Xbee']
+	boards = ['Arduino UNO', 'Arduino Nano', 'Arduino Micro', 'BeagleBone Black',
+		'Raspberry Pi A+', 'Raspberry Pi B+', 'Trinket Pro', 'Waspmote']
+	signal = ['A', 'D']
+	direction = ['R', 'W']
+	for i in range(1, 5):
+		node = {}
+		node[N_NAME] = "Super Node " + str(i)
+		node[N_BOARD] = boards[random.randint(0, len(boards) - 1)]
+		node[N_NIC] = nic[random.randint(0, len(nic) - 1)]
 		sensors = []
-		sensor = {}
-		sensor['id'] = id
-		sensor['name'] = 'TMP36'
-		sensor['AD'] = 'D'
-		sensor['pin'] = 5
-		sensor['type'] = 'R'
-		sensor['refresh'] = 3000
-	"""
-	pass
+		for j in range(0, 3):
+			sensor = {}
+			sensor[S_NAME] = 'TMP3' + str(j)
+			sensor[S_SIGNAL] = signal[random.randint(0, len(signal) - 1)]
+			sensor[S_PIN] = random.randint(0, 10)
+			sensor[S_DIRECTION] = direction[random.randint(0, len(direction) - 1)]
+			sensor[S_REFRESH] = 1000 * random.randint(1, 10)
+			sensors.append(sensor)
+		node[N_SENSORS] = sensors
+		insert_node(node)
+	print "[ MANAGER ]: Test data added."
+	
 
 ## Keys ##
 
-def increment_key_sensor(pipe):
-	pass
+def _increment_key_sensor():
+	""" Increments the primary key of the sensors. """
+	ret = db.incr(KEY_AUTO_SENSOR_ID)
+	return str(ret)
 
-def increment_key_node(pipe):
-	pass
+def _increment_key_node():
+	""" Increments the primary key of the nodes. """
+	ret = db.incr(KEY_AUTO_NODE_ID)
+	return str(ret)
 
 ##  Nodes & Sensors ##
 
 def insert_node(node):
-	pass
+	"""
+	Inserts a node into the db.
+	If the node has sensors they are also inserted.
+	"""
+	id = _increment_key_node()
+	db.hset(KEY_NODES + id, N_ID, id)
+	db.hset(KEY_NODES + id, N_NAME, node[N_NAME])
+	db.hset(KEY_NODES + id, N_BOARD, node[N_BOARD])
+	db.hset(KEY_NODES + id, N_SENSORS, KEY_LIST_SENSORS_IN_NODE + id)
+	if node.get(N_SENSORS) != None:
+		for sensor in node[N_SENSORS]:
+			insert_sensor_to_node(id, sensor)
 
 def delete_node(id):
-	pass
+	"""
+	Deletes a node from the db as well as all the sensors related to the node.
+	"""
+	id = str(id)
+	for id_sensor in db.smembers(KEY_LIST_SENSORS_IN_NODE):
+		delete_sensor_from_node(id, id_sensor)
+	db.delete(KEY_LIST_SENSORS_IN_NODE)
+	db.delete(KEY_NODES + id)
 
 def modify_node(new_node):
-	pass
+	""" Modifies simple data (name, board_type, nic) from the node. """
+	db.hset(KEY_NODES + str(new_node[N_ID]), N_NAME, new_node[N_NAME])
+	db.hset(KEY_NODES + str(new_node[N_ID]), N_BOARD, new_node[N_BOARD])
+	db.hset(KEY_NODES + str(new_node[N_ID]), N_NIC, new_node[N_NIC])
+
+def get_node(node_id):
+	""" Returns the node given the id, as well as all its sensors. """
+	node = db.hgetall(KEY_NODES + str(node_id))
+	sensors = get_sensors(node_id)
+	node[N_SENSORS] = sensors
+	return node
+
+def get_sensors(node_id):
+	""" Returns the list of sensors of a node."""
+	sensors = []
+	for sensor_id in db.smembers(KEY_LIST_SENSORS_IN_NODE + str(node_id)):
+		sensor = get_sensor(sensor_id)
+		if sensor != None:
+			sensors.append(sensor)
+	return sensors
+
+def get_sensor(sensor_id):
+	""" Gets a sensor given its id. """
+	return db.hgetall(KEY_SENSORS + str(sensor_id))
+
+def _insert_sensor(sensor):
+	"""
+	Inserts a sensor to the db.
+	Returns the new generated id for the sensor.
+	"""
+	id = _increment_key_sensor()
+	db.hset(KEY_SENSORS + id, S_ID, id)
+	db.hset(KEY_SENSORS + id, S_NAME, sensor[S_NAME])
+	db.hset(KEY_SENSORS + id, S_SIGNAL, sensor[S_SIGNAL])
+	db.hset(KEY_SENSORS + id, S_PIN, sensor[S_PIN])
+	db.hset(KEY_SENSORS + id, S_DIRECTION, sensor[S_DIRECTION])
+	db.hset(KEY_SENSORS + id, S_REFRESH, sensor[S_REFRESH])
+	return id
 
 def insert_sensor_to_node(node_id, sensor):
-	pass
+	""" Adds a new sensor to the node. """
+	sensor_id = _insert_sensor(sensor)
+	db.sadd(KEY_LIST_SENSORS_IN_NODE + str(node_id), sensor_id)
 
 def delete_sensor_from_node(node_id, sensor_id):
-	pass
+	""" Deletes a sensor from the node."""
+	db.delete(KEY_SENSORS + str(sensor_id))
+	db.srem(KEY_LIST_SENSORS_IN_NODE + str(node_id), str(sensor_id))
 
 def modify_sensor(new_sensor):
-	pass
+	""" Modifies the sensor's data."""
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_NAME, new_sensor[S_NAME])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_SIGNAL, new_sensor[S_SIGNAL])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_PIN, new_sensor[S_PIN])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_DIRECTION, new_sensor[S_DIRECTION])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_REFRESH, new_sensor[S_REFRESH])

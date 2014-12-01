@@ -162,6 +162,6 @@ def modify_sensor(new_sensor):
 	""" Modifies the sensor's data."""
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_NAME, new_sensor[S_NAME])
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_SIGNAL, new_sensor[S_SIGNAL])
-	db.hset(KEY_SENSORS + new_sensor[S_ID], S_PIN, str(new_sensor[S_PIN])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_PIN, str(new_sensor[S_PIN]))
 	db.hset(KEY_SENSORS + new_sensor[S_ID], S_DIRECTION, new_sensor[S_DIRECTION])
-	db.hset(KEY_SENSORS + new_sensor[S_ID], S_REFRESH, str(new_sensor[S_REFRESH])
+	db.hset(KEY_SENSORS + new_sensor[S_ID], S_REFRESH, str(new_sensor[S_REFRESH]))

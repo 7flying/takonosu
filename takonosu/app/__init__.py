@@ -212,7 +212,7 @@ class NodeSensorsAPI(Resource):
 			managet.delete_sensor_from_node(id, args['sensor_id'])
 			return jsonify(message="Sensor deleted from node", code=201)
 
-api.add_resource(NodeSensorsAPI, '/takonosu/api/node/<int:id>/sensors',
+api.add_resource(NodeSensorsAPI, '/takonosu/api/nodes/<int:id>/sensors',
 	endpoint='sensors')
 
 

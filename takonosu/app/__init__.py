@@ -106,7 +106,7 @@ class SensorAPI(Resource):
 api.add_resource(SensorAPI, '/takonosu/api/sensor', endpoint='sensor')
 
 
-class NodeAPI(Resource):
+class Nodes(Resource):
 	""" Class for the Node resource. """
 	node_field = {
 		'id': fields.Integer,
@@ -122,29 +122,29 @@ class NodeAPI(Resource):
 		self.reqparse.add_argument('name', type=str)
 		self.reqparse.add_argument('board_type', type=str)
 		self.reqparse.add_argument('nic', type=str)
-		super(NodeAPI, self).__init__()
+		super(Nodes, self).__init__()
 
 	def get(self):
-		""" Returns a node by its id. """
+		""" Returns all the nodes + sensors on the db. """
 		args = self.reqparse.parse_args()
-		if args['id'] != None:
+		if args['id'] == None: # We want al the nodes
+			nodes = manager.get_nodes()
+			return jsonify(nodes=nodes)
+		elif args['id'] != None:
 			node = manager.get_node(args['id'])
-			return {'node' : marshal(node, NodeAPI.node_field)}
-
+			return {'node' : marshal(node, Nodes.node_field)}
+		else:
+			abort(400)	
 	def post(self):
 		""" Creates a new node."""
-		args = self.reqparse.parse_args()
-		if args['id'] != None:
-			node = {}
-			node['name'] = args['name']
-			node['board_type'] = args['board_type']
-			node['nic'] = args['nic']
-			node['sensors'] = []
-			result = manager.insert_node(node)
-			created = manager.get_node(result)
-			return {'node' : marshal(created, NodeAPI.node_field)}
-		else:
-			abort(400)
+		node = {}
+		node['name'] = args['name']
+		node['board_type'] = args['board_type']
+		node['nic'] = args['nic']
+		node['sensors'] = []
+		result = manager.insert_node(node)
+		created = manager.get_node(result)
+		return {'node' : marshal(created, NodeAPI.node_field)}
 
 	def put(self):
 		""" Edit a Node."""
@@ -172,7 +172,7 @@ class NodeAPI(Resource):
 		else:
 			abort(400)
 
-api.add_resource(NodeAPI, '/takonosu/api/node', endpoint='node')
+api.add_resource(NodeAPI, '/takonosu/api/nodes', endpoint='node')
 
 
 class NodeSensorsAPI(Resource):
@@ -214,26 +214,3 @@ class NodeSensorsAPI(Resource):
 
 api.add_resource(NodeSensorsAPI, '/takonosu/api/nodes/<int:id>/sensors',
 	endpoint='sensors')
-
-
-class NodesAPI(Resource):
-	""" Class for the nodes resource."""
-
-	def __init__(self):
-		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('id', type=str)
-		super(NodesAPI, self).__init__()
-
-	def get(self):
-		""" Returns all the nodes + sensors on the db. """
-		args = self.reqparse.parse_args()
-		if args['id'] == None: # We want al the nodes
-			nodes = manager.get_nodes()
-			return jsonify(nodes=nodes)
-		elif args['id'] != None:
-			node = manager.get_node(args['id'])
-			return {'node' : marshal(node, NodeAPI.node_field)}
-		else:
-			abort(400)	
-
-api.add_resource(NodesAPI, '/takonosu/api/nodes', endpoint='nodes')

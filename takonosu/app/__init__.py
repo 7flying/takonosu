@@ -126,7 +126,7 @@ class NodeAPI(Resource):
 
 	def get(self):
 		""" Returns a node by its id. """
-		args = self.reqparse,parse_args()
+		args = self.reqparse.parse_args()
 		if args['id'] != None:
 			node = manager.get_node(args['id'])
 			return {'node' : marshal(node, NodeAPI.node_field)}
@@ -214,3 +214,17 @@ class NodeSensorsAPI(Resource):
 
 api.add_resource(NodeSensorsAPI, '/takonosu/api/node/<int:id>/sensors',
 	endpoint='sensors')
+
+
+class NodesAPI(Resource):
+	""" Class for the nodes resource."""
+
+	def __init__(self):
+		super(NodesAPI, self).__init__()
+
+	def get(self):
+		""" Returns all the nodes + sensors on the db. """
+		nodes = manager.get_nodes()
+		return jsonify(nodes=nodes)
+
+api.add_resource(NodesAPI, '/takonosu/api/nodes', endpoint='nodes')

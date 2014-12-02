@@ -121,6 +121,14 @@ def get_node(node_id):
 	node[N_SENSORS] = sensors
 	return node
 
+def get_nodes():
+	""" Returns every node and sensor in the db. """
+	ret = []
+	max_id = int(db.get(KEY_AUTO_NODE_ID))
+	for i in range(1, max_id + 1):
+		ret.append(get_node(i))
+	return ret
+
 def get_sensors(node_id):
 	""" Returns the list of sensors of a node."""
 	sensors = []

@@ -1,6 +1,7 @@
 angular.module('flagular')
   .controller('SensorCtrl', function ($scope, $stateParams, Node) {
   
+  //bla
   $scope.editSensor = function(sensor) {
       if(sensor.edit)
         sensor.edit = false;

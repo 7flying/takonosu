@@ -2,15 +2,26 @@
 
 angular.module('flagular')
   .factory('Node', function ($resource) {
-    return $resource('/takonosu/api/node', null,
+    return $resource('/takonosu/api/nodes/:id/:sensors', {
+      id: '@id',
+      sensors: '@sensors'
+    },
     {
       get: {
-        method: 'GET',
-        params: 3
+        method: 'GET'
       },
       query: {
         method: 'GET',
         params: { }
+      },
+      update: {
+        method: 'PUT'
+      },
+      getSensors: {
+        method: 'GET',
+        params: {
+          sensors: 'sensors'
+        }
       }
 	  });
   });

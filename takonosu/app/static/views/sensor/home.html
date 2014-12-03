@@ -1,0 +1,40 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Sensor</h2>
+            <div class="nav nav-tabs nav-stacked" ng-repeat="sensor in sensors">
+            	<div>
+                    <span class="glyphicon glyphicon-pencil" ng-click="editSensor(sensor)"></span>
+                    <div ng-hide="sensor.edit">
+                       <div>
+                            <label>Sensor: {{sensor.name}}</label>
+                        </div>
+                        <div>
+                            <label>Signal: {{sensor.AD}}<label>
+                        </div>
+                        <div>
+                            <label>Pin: {{sensor.pin}}</label>
+                        </div>
+                        <div>
+                            <label>Rate: {{sensor.refresh}}</label>
+                        </div>
+                        <div>
+                            <label>Direction: {{sensor.type}}</label>
+                        </div>
+                    </div>
+                    <div ng-show="sonsor.edit">
+                        <form class="thing-form">
+                            <input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type">
+                            <input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name">
+                            <input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic">
+                        </form>
+                        <button type="submit" class="btn btn-default btn" ng-click="updateNode(node)">Submit</button>
+                    </div>	
+                </div>
+            </div>
+            <p>
+             <span translate="main.like">If you like this Angular-Flask generator, please give us a star at </span>&nbsp;<a href="https://github.com/rayokota/generator-angular-flask" target="_blank" translate="main.github">Github</a>!
+            </p>
+        </div>
+    </div>
+</div>

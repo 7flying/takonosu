@@ -1,9 +1,8 @@
 // Declare app level module which depends on filters, and services
-angular.module('flagular', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.date'])
-  .config(['$routeProvider', function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/home/home.html', 
-        controller: 'HomeController'})
-      .otherwise({redirectTo: '/'});
-  }]);
+angular.module('flagular', ['ngResource', 'ui.bootstrap', 'ui.date', 'ui.router'])
+    .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+    $urlRouterProvider
+      .otherwise('/');
+
+      $locationProvider.html5Mode(true);
+  });

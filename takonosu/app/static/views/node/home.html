@@ -1,0 +1,34 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Nodes</h2>
+            <div class="nav nav-tabs nav-stacked" ng-repeat="node in nodes">
+            	<div>
+                    <span class="glyphicon glyphicon-pencil" ng-click="editNode(node)"></span>
+                    <div ng-hide="node.edit" ui-sref="sensor({ id: node.id })">
+                        <div>
+                		  <label>Board type: {{node.board_type}}</label>
+                	   </div>
+                	   <div>
+                		  <label>Name: {{node.name}}</label>
+                	   </div>
+                	   <div>
+                		  <label>NIC: {{node.nic}}</label>
+                	   </div>
+                    </div>
+                    <div ng-show="node.edit">
+                        <form class="thing-form">
+                            <input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type">
+                            <input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name">
+                            <input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic">
+                        </form>
+                        <button type="submit" class="btn btn-default btn" ng-click="updateNode(node)">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <p>
+             <span translate="main.like">If you like this Angular-Flask generator, please give us a star at </span>&nbsp;<a href="https://github.com/rayokota/generator-angular-flask" target="_blank" translate="main.github">Github</a>!
+            </p>
+        </div>
+    </div>
+</div>

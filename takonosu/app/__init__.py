@@ -132,7 +132,7 @@ class NodesAPI(Resource):
 			return jsonify(nodes=nodes)
 		elif args['id'] != None:
 			node = manager.get_node(args['id'])
-			return {'node' : marshal(node, Nodes.node_field)}
+			return {'node' : marshal(node, NodesAPI.node_field)}
 		else:
 			abort(400)	
 	def post(self):

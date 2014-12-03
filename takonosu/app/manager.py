@@ -91,6 +91,7 @@ def insert_node(node):
 	db.hset(KEY_NODES + id, N_ID, id)
 	db.hset(KEY_NODES + id, N_NAME, node[N_NAME])
 	db.hset(KEY_NODES + id, N_BOARD, node[N_BOARD])
+	db.hset(KEY_NODES + id, N_NIC, node[N_NIC])
 	db.hset(KEY_NODES + id, N_SENSORS, KEY_LIST_SENSORS_IN_NODE + id)
 	if node.get(N_SENSORS) != None:
 		for sensor in node[N_SENSORS]:

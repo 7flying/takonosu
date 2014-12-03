@@ -3,31 +3,55 @@
         <div class="col-md-8">
             <h2>Nodes</h2>
             <div class="nav nav-tabs nav-stacked" ng-repeat="node in nodes">
-            	<div>
-                    <span class="glyphicon glyphicon-pencil" ng-click="editNode(node)"></span>
-                    <div ng-hide="node.edit" ui-sref="sensor({ id: node.id })">
-                        <div>
-                		  <label>Board type: {{node.board_type}}</label>
-                	   </div>
-                	   <div>
-                		  <label>Name: {{node.name}}</label>
-                	   </div>
-                	   <div>
-                		  <label>NIC: {{node.nic}}</label>
-                	   </div>
+            	<div class="panel panel-default">
+                    <div class="panel-heading" ui-sref="sensor({ id: node.id })" ng-hide="node.edit">
+                        <span>{{node.name}}</span>
                     </div>
+                    <div class="panel-body">
+                        <table class="table" ng-hide="node.edit">
+                            <tr>
+                                <th>Board</th>
+                                <th>Network Interface Controller</th>
+                                <th ui-sref="sensor({ id: node.id })"># Sensors</th>
+                            </tr>
+                            <tr>
+                                <td>{{node.board_type}}</td>
+                                <td>{{node.nic}}</td>
+                                <td ui-sref="sensor({ id: node.id })">{{node.sensors.length}}</td>
+                            </tr>
+                        </table>
                     <div ng-show="node.edit">
                         <form class="thing-form">
-                            <input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type">
-                            <input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name">
-                            <input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic">
+                            <div class="panel-heading">
+                                <span><input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name"></span>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <tr>
+                                        <th>Board</th>
+                                        <th>Network Interface Controller</th>
+                                        <th># Sensors</th>
+                                    </tr>
+                                    <tr>
+                                        <td><input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type"></td>
+                                        <td><input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic"></td>
+                                        <td>{{node.sensors.length}}</td>
+                                    </tr>
+                                </table>
+
                         </form>
                         <button type="submit" class="btn btn-default btn" ng-click="updateNode(node)">Submit</button>
+                    </div>
+                    </div>
+                     <div class="panel-footer" ng-hide="node.edit">
+                        <span class="glyphicon glyphicon-pencil" ng-click="editNode(node)"></span>
+                    </div>
+                    <div class="panel-footer" ng-show="node.edit">
+                        <span class="glyphicon glyphicon-remove" ng-click="editNode(node)"></span>
                     </div>
                 </div>
             </div>
             <p>
-             <span translate="main.like">If you like this Angular-Flask generator, please give us a star at </span>&nbsp;<a href="https://github.com/rayokota/generator-angular-flask" target="_blank" translate="main.github">Github</a>!
             </p>
         </div>
     </div>

@@ -19,7 +19,7 @@ def root():
 @app.errorhandler(404)
 def page_not_found(e):
     # return app.send_static_file('index.html')
-    return redirect(url_for('index'))
+    return redirect('/')
 """
 
 @app.route('/<regex(".+"):else>/')

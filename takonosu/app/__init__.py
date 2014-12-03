@@ -106,7 +106,7 @@ class SensorAPI(Resource):
 api.add_resource(SensorAPI, '/takonosu/api/sensor', endpoint='sensor')
 
 
-class Nodes(Resource):
+class NodesAPI(Resource):
 	""" Class for the Node resource. """
 	node_field = {
 		'id': fields.Integer,
@@ -122,7 +122,7 @@ class Nodes(Resource):
 		self.reqparse.add_argument('name', type=str)
 		self.reqparse.add_argument('board_type', type=str)
 		self.reqparse.add_argument('nic', type=str)
-		super(Nodes, self).__init__()
+		super(NodesAPI, self).__init__()
 
 	def get(self):
 		""" Returns all the nodes + sensors on the db. """
@@ -144,7 +144,7 @@ class Nodes(Resource):
 		node['sensors'] = []
 		result = manager.insert_node(node)
 		created = manager.get_node(result)
-		return {'node' : marshal(created, NodeAPI.node_field)}
+		return {'node' : marshal(created, NodesAPI.node_field)}
 
 	def put(self):
 		""" Edit a Node."""
@@ -172,7 +172,7 @@ class Nodes(Resource):
 		else:
 			abort(400)
 
-api.add_resource(NodeAPI, '/takonosu/api/nodes', endpoint='node')
+api.add_resource(NodesAPI, '/takonosu/api/nodes', endpoint='nodes')
 
 
 class NodeSensorsAPI(Resource):

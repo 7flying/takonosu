@@ -6,11 +6,11 @@
             	<div>
                     <span class="glyphicon glyphicon-pencil" ng-click="editSensor(sensor)"></span>
                     <div ng-hide="sensor.edit">
-                       <div>
+                        <div>
                             <label>Sensor: {{sensor.name}}</label>
                         </div>
                         <div>
-                            <label>Signal: {{sensor.AD}}<label>
+                            <label>Signal: {{sensor.signal}}</label>
                         </div>
                         <div>
                             <label>Pin: {{sensor.pin}}</label>
@@ -22,13 +22,15 @@
                             <label>Direction: {{sensor.type}}</label>
                         </div>
                     </div>
-                    <div ng-show="sonsor.edit">
+                    <div ng-show="sensor.edit">
                         <form class="thing-form">
-                            <input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type">
-                            <input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name">
-                            <input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic">
+                            <input value="{{sensor.name}}" type="text" class="form-control" placeholder="Name" ng-model="sensor.name">
+                            <input value="{{sensor.signal}}" type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal">
+                            <input value="{{sensor.pin}}" type="text" class="form-control" placeholder="Pin" ng-model="sensor.pin">
+                            <input value="{{sensor.refresh}}" type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh">
+                            <input value="{{sensor.type}}" type="text" class="form-control" placeholder="Type" ng-model="sensor.type">
                         </form>
-                        <button type="submit" class="btn btn-default btn" ng-click="updateNode(node)">Submit</button>
+                        <button type="submit" class="btn btn-default btn" ng-click="updateSensor(sensor)">Submit</button>
                     </div>	
                 </div>
             </div>

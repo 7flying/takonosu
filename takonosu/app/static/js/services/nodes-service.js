@@ -14,7 +14,10 @@ angular.module('flagular')
         method: 'GET',
         params: { }
       },
-      update: {
+      updateNode: {
+        method: 'PUT'
+      },
+      updateSensor: {
         method: 'PUT'
       },
       getSensors: {

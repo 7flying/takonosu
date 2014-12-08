@@ -9,20 +9,15 @@ angular.module('flagular')
         sensor.edit = true;
     };
 
-  $scope.updateSensor = function(node) {
-    Node.update({
-      "id": node.id,
-      "board_type": node.board_type,
-      "name": node.name,
-      "nic": node.nic
-    }, function() {
-      node.edit = false;
-    });
+  $scope.updateSensor = function(sensor) {
+    sensor.edit = false;
   }
 
   Node.getSensors({id: $stateParams.id}).$promise.then(
     function success(data) {
-      console.log(data.sensors);
-      $scope.sensors = data.sensors;
+      angular.forEach(data.sensors, function(sensor) {
+        sensor.edit = false;
+        $scope.sensors = data.sensors;
+      });
     });
   });

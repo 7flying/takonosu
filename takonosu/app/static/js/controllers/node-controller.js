@@ -21,6 +21,9 @@ angular.module('flagular')
 
   	Node.query().$promise.then(
     	function success(data) {
-    		$scope.nodes = data.nodes;
+    		angular.forEach(data.nodes, function(node) {
+          node.edit = false;
+          $scope.nodes = data.nodes;
+        });
     	});
   	});

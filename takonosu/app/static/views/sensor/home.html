@@ -19,7 +19,7 @@
                                 <td>{{sensor.signal}}</td>
                                 <td>{{sensor.pin}}</td>
                                 <td>{{sensor.refresh}}</td>
-                                <td>{{sensor.type}}</td>  
+                                <td>{{sensor.direction}}</td>  
                             </tr>
                         </table>
                         <div ng-show="sensor.edit">
@@ -39,7 +39,7 @@
                                             <td><input value="{{sensor.signal}}" type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal"></td>
                                             <td><input value="{{sensor.pin}}" type="text" class="form-control" placeholder="Pin" ng-model="sensor.pin"></td>
                                             <td><input value="{{sensor.refresh}}" type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh"></td>
-                                            <td><input value="{{sensor.type}}" type="text" class="form-control" placeholder="Direction" ng-model="sensor.type"></td>  
+                                            <td><input value="{{sensor.direction}}" type="text" class="form-control" placeholder="Direction" ng-model="sensor.direction"></td>  
                                         </tr>
                                     </table>
                                 </div>

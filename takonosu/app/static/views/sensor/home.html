@@ -46,7 +46,7 @@
                             </form>
                             <button type="submit" class="btn btn-default btn" ng-click="updateSensor(sensor)">Submit</button>
                         </div>
-                        <div>
+                        <div ng-hide="sensor.edit">
                             <div ng-if="sensor.direction == 'W'">
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                             <div ng-if="sensor.direction == 'R'">
-                                <span><span>Latest value: </span><span class="label label-default" ng-model="sensor.in"></span></span>
+                                <span><span>Latest value: {{sensor.in}}</span><span class="label label-default" ng-model="sensor.in"></span></span>
                             </div>
                         </div>
                     </div>

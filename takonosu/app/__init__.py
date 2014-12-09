@@ -27,10 +27,8 @@ class DataAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('node', type=int, location='form',
-			required=True)
-		self.reqparse.add_argument('sensor', type=int, location='form',
-			required=True)
+		self.reqparse.add_argument('node', type=int, location='form')
+		self.reqparse.add_argument('sensor', type=int, location='form')
 		self.reqparse.add_argument('data', type=str, location='form')
 		super(DataAPI, self).__init__()
 

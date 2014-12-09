@@ -1,5 +1,5 @@
 angular.module('flagular')
-  .controller('SensorCtrl', function ($scope, $stateParams, Node) {
+  .controller('SensorCtrl', function ($scope, $stateParams, Node, SensorData) {
   
   //bla
   $scope.editSensor = function(sensor) {
@@ -17,6 +17,14 @@ angular.module('flagular')
     function success(data) {
       angular.forEach(data.sensors, function(sensor) {
         sensor.edit = false;
+        if(sensor.direction === 'R')
+        setInterval(function() {
+          //call to the read service.
+          SensorData.getData(function (data) {
+            $scope.sensor.in = data.data.value + ' ' + data.data.unit;
+            console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
+          });
+        }, sensor.refresh);
         $scope.sensors = data.sensors;
       });
     });

@@ -1,6 +1,6 @@
 angular.module('flagular')
   .controller('SensorCtrl', function ($scope, $stateParams, Node, SensorData) {
-  
+  $scope.newSensor = false;
   //bla
   $scope.editSensor = function(sensor) {
       if(sensor.edit)
@@ -11,6 +11,14 @@ angular.module('flagular')
 
   $scope.updateSensor = function(sensor) {
     sensor.edit = false;
+  }
+
+  $scope.createSensor = function() {
+    console.log("on sensor create, value: " + $scope.newSensor);
+    if($scope.newSensor)
+      $scope.newSensor = false;
+    else
+      $scope.newSensor = true;
   }
 
   Node.getSensors({id: $stateParams.id}).$promise.then(

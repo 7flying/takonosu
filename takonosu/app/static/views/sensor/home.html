@@ -1,75 +1,103 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Sensor</h2>
-            <div class="nav nav-tabs nav-stacked" ng-repeat="sensor in sensors">
-                <div class="panel panel-default">
-                    <div class="panel-heading" ng-hide="sensor.edit">
-                        <span>{{sensor.name}}</span>
-                    </div>
+<div class="container">
+    <div class="col-md-8">
+        <h2>Sensor</h2>
+        <div ng-show="newSensor" class="panel panel-default">
+            <form>
+                <div class="panel-heading">
+                    <span><input value="{{sensor.name}}" type="text" class="form-control" placeholder="Name" ng-model="sensor.name"></span>
+                </div>
                     <div class="panel-body">
-                        <table class="table" ng-hide="sensor.edit">
+                        <table class="table">
                             <tr>
                                 <th>Signal</th>
                                 <th>Pin</th>
-                                <th>Rate</th>
                                 <th>Direction</th>   
+                                <th>Rate</th>
                             </tr>
                             <tr>
-                                <td>{{sensor.signal}}</td>
-                                <td>{{sensor.pin}}</td>
-                                <td>{{sensor.refresh}}</td>
-                                <td>{{sensor.direction}}</td>  
+                                <td><input required value="{{sensor.signal}}" type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal"></td>
+                                <td><input required value="{{sensor.pin}}" type="text" class="form-control" placeholder="Pin" type="number" ng-model="sensor.pin"></td>
+                                <td><input required value="{{sensor.direction}}" type="text" class="form-control" placeholder="Direction" ng-model="sensor.direction"></td>  
+                                <td><input value="{{sensor.refresh}}" type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh"></td>
                             </tr>
                         </table>
-                        <div ng-show="sensor.edit">
-                            <form>
-                                <div class="panel-heading">
-                                    <span><input value="{{sensor.name}}" type="text" class="form-control" placeholder="Name" ng-model="sensor.name"></span>
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table">
-                                        <tr>
-                                            <th>Signal</th>
-                                            <th>Pin</th>
-                                            <th>Rate</th>
-                                            <th>Direction</th>   
-                                        </tr>
-                                        <tr>
-                                            <td><input value="{{sensor.signal}}" type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal"></td>
-                                            <td><input value="{{sensor.pin}}" type="text" class="form-control" placeholder="Pin" ng-model="sensor.pin"></td>
-                                            <td><input value="{{sensor.refresh}}" type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh"></td>
-                                            <td><input value="{{sensor.direction}}" type="text" class="form-control" placeholder="Direction" ng-model="sensor.direction"></td>  
-                                        </tr>
-                                    </table>
-                                </div>
-                            </form>
-                            <button type="submit" class="btn btn-default btn" ng-click="updateSensor(sensor)">Submit</button>
-                        </div>
-                        <div ng-hide="sensor.edit">
-                            <div ng-if="sensor.direction == 'W'">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" ng-model="sensor.out">
-                                                <span class="input-group-btn">
-                                                    <button class="btn btn-default" type="button" ng-click="sensor.sendData(sensor.out)">Send</button>
-                                                </span>
-                                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" class="btn btn-default btn" ng-click="createSensor(sensor)">Create</button>
+                    </div>
+                </form>
+        </div>
+        <div class="nav nav-tabs nav-stacked" ng-repeat="sensor in sensors">
+            <div class="panel panel-default">
+                <div class="panel-heading" ng-hide="sensor.edit">
+                    <span>{{sensor.name}}</span>
+                </div>
+                <div class="panel-body">
+                    <table class="table" ng-hide="sensor.edit">
+                        <tr>
+                            <th>Signal</th>
+                            <th>Pin</th>
+                            <th>Rate</th>
+                            <th>Direction</th>   
+                        </tr>
+                        <tr>
+                            <td>{{sensor.signal}}</td>
+                            <td>{{sensor.pin}}</td>
+                            <td>{{sensor.refresh}}</td>
+                            <td>{{sensor.direction}}</td>  
+                        </tr>
+                    </table>
+                    <div ng-show="sensor.edit">
+                       <form>
+                            <div class="panel-heading">
+                                <span><input value="{{sensor.name}}" type="text" class="form-control" placeholder="Name" ng-model="sensor.name"></span>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <tr>
+                                        <th>Signal</th>
+                                        <th>Pin</th>
+                                        <th>Rate</th>
+                                        <th>Direction</th>   
+                                    </tr>
+                                    <tr>
+                                        <td><input value="{{sensor.signal}}" type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal"></td>
+                                        <td><input value="{{sensor.pin}}" type="text" class="form-control" placeholder="Pin" ng-model="sensor.pin"></td>
+                                        <td><input value="{{sensor.refresh}}" type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh"></td>
+                                        <td><input value="{{sensor.direction}}" type="text" class="form-control" placeholder="Direction" ng-model="sensor.direction"></td>  
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                        <button type="submit" class="btn btn-default btn" ng-click="updateSensor(sensor)">Submit</button>
+                    </div>
+                    <div ng-hide="sensor.edit">
+                        <div ng-if="sensor.direction == 'W'">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="sensor.out">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="sensor.sendData(sensor.out)">Send</button>
+                                            </span>
                                     </div>
                                 </div>
                             </div>
-                            <div ng-if="sensor.direction == 'R'">
-                                <span><span>Latest value: {{sensor.in}}</span><span class="label label-default" ng-model="sensor.in"></span></span>
-                            </div>
+                        </div>
+                        <div ng-if="sensor.direction == 'R'">
+                            <span><span>Latest value: {{sensor.in}}</span><span class="label label-default" ng-model="sensor.in"></span></span>
                         </div>
                     </div>
-                    <dr>
-                    <div class="panel-footer">
-                        <span ng-class="{'glyphicon glyphicon-pencil': !sensor.edit, 'glyphicon glyphicon-remove': sensor.edit}" ng-click="editSensor(sensor)"></span>
-                    </div>
+                </div>
+                <dr>
+                <div class="panel-footer">
+                    <span ng-class="{'glyphicon glyphicon-pencil': !sensor.edit, 'glyphicon glyphicon-remove': sensor.edit}" ng-click="editSensor(sensor)"></span>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="col-md-4">
+        <h2>Options</h2>
+        <button class="btn btn-default" type="button" ng-click="createSensor()">Add sensor to node</button>
     </div>
 </div>

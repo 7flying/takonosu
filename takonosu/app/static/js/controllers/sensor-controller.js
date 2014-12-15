@@ -29,6 +29,9 @@ angular.module('flagular')
       console.log('removed');
       $scope.sensors.splice(index, 1);
       //Call server to upload removal.
+      if($scope.sensors.length == 0) {
+        $scope.newSensor = true;
+      }
     }
   }
 

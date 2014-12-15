@@ -2,7 +2,7 @@ angular.module('flagular')
   .controller('HomeCtrl', function ($scope, Node) {
   
   $scope.nodes = [];
-
+  $scope.newNode = false;
 	$scope.editNode = function(node) {
   		if(node.edit)
   			node.edit = false;
@@ -21,11 +21,22 @@ angular.module('flagular')
   		});
   	}
 
+    $scope.createNode = function() {
+      console.log("on node create, value: " + $scope.newNode);
+      if($scope.newNode)
+        $scope.newNode = false;
+      else
+        $scope.newNode = true;
+    }
+
      $scope.removeNode = function(index) {
     if(confirm("Are you sure you want to remove this node?")) {
       console.log('removed');
       $scope.nodes.splice(index, 1);
       //Call server to upload removal.
+      if($scope.nodes.length == 0) {
+        $scope.newNode = true;
+      }
     }
   }
 

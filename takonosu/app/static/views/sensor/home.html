@@ -91,7 +91,8 @@
                 </div>
                 <dr>
                 <div class="panel-footer">
-                    <span ng-class="{'glyphicon glyphicon-pencil': !sensor.edit, 'glyphicon glyphicon-remove': sensor.edit}" ng-click="editSensor(sensor)"></span>
+                    <span ng-class="{'glyphicon glyphicon-pencil': !sensor.edit, 'glyphicon glyphicon-remove': sensor.edit}" ng-click="editSensor($index)"></span>
+                     <span ng-class="{'glyphicon glyphicon-trash': !sensor.edit}" ng-click="removeSensor($index)"></span>
                 </div>
             </div>
         </div>

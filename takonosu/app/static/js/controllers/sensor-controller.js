@@ -1,12 +1,15 @@
 angular.module('flagular')
   .controller('SensorCtrl', function ($scope, $stateParams, Node, SensorData) {
   $scope.newSensor = false;
-  //bla
-  $scope.editSensor = function(sensor) {
-      if(sensor.edit)
-        sensor.edit = false;
+  $scope.sensors = [];
+  tempSensors = [];
+  $scope.editSensor = function(index) {
+      if($scope.sensors[index].edit) {
+          $scope.sensors[index].edit = false;
+          $scope.sensors[index] = tempSensors[index];
+      }
       else
-        sensor.edit = true;
+        $scope.sensors[index].edit = true;
     };
 
   $scope.updateSensor = function(sensor) {
@@ -21,10 +24,20 @@ angular.module('flagular')
       $scope.newSensor = true;
   }
 
+  $scope.removeSensor = function(index) {
+    if(confirm("Are you sure you want to remove this sensor?")) {
+      console.log('removed');
+      $scope.sensors.splice(index, 1);
+      //Call server to upload removal.
+    }
+  }
+
   Node.getSensors({id: $stateParams.id}).$promise.then(
     function success(data) {
       angular.forEach(data.sensors, function(sensor) {
         sensor.edit = false;
+        $scope.sensors = data.sensors;
+        tempSensors = JSON.parse(JSON.stringify($scope.sensors));
         if(sensor.direction === 'R')
         setInterval(function() {
           SensorData.getData(function (data) {
@@ -32,7 +45,6 @@ angular.module('flagular')
             console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
           });
         }, sensor.refresh);
-        $scope.sensors = data.sensors;
       });
     });
   });

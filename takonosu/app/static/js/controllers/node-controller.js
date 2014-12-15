@@ -1,6 +1,8 @@
 angular.module('flagular')
   .controller('HomeCtrl', function ($scope, Node) {
   
+  $scope.nodes = [];
+
 	$scope.editNode = function(node) {
   		if(node.edit)
   			node.edit = false;
@@ -18,6 +20,14 @@ angular.module('flagular')
   			node.edit = false;
   		});
   	}
+
+     $scope.removeNode = function(index) {
+    if(confirm("Are you sure you want to remove this node?")) {
+      console.log('removed');
+      $scope.nodes.splice(index, 1);
+      //Call server to upload removal.
+    }
+  }
 
   	Node.query().$promise.then(
     	function success(data) {

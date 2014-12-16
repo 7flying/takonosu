@@ -29,7 +29,7 @@ angular.module('flagular')
           "board_type": $scope.newNodeBoard_type,
           "nic": $scope.newNodeNic
         }, function (data) {
-          console.log(data);
+          $scope.nodes.push(data.node);
         });
       } else
         $scope.newNode = true;
@@ -37,8 +37,6 @@ angular.module('flagular')
 
      $scope.removeNode = function(index) {
     if(confirm("Are you sure you want to remove this node?")) {
-      console.log(index);
-      console.log($scope.nodes[index].id);
       Node.deleteNode({"id": $scope.nodes[index].id}, function() {
         $scope.nodes.splice(index, 1);
       });

@@ -7,7 +7,7 @@ angular.module('flagular')
         controller: 'HomeCtrl'
       })
       .state('sensor', {
-      	url: '/:id',
+      	url: '/?id',
       	templateUrl: 'views/sensor/home.html',
       	controller: 'SensorCtrl'
       });

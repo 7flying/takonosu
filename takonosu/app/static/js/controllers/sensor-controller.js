@@ -18,9 +18,17 @@ angular.module('flagular')
 
   $scope.createSensor = function() {
     console.log("on sensor create, value: " + $scope.newSensor);
-    if($scope.newSensor)
+    if($scope.newSensor) {
       $scope.newSensor = false;
-    else
+      Node.createSensor({
+        "identifier": $stateParams.id,
+        "name": $scope.newSensorName,
+        "signal": $scope.newSensorSignal,
+        "pin": $scope.newSensorPin,
+        "direction": $scope.newSensorDirection,
+        "refresh": $scope.newSensorRefesh
+      });
+    } else
       $scope.newSensor = true;
   }
 
@@ -35,7 +43,7 @@ angular.module('flagular')
     }
   }
 
-  Node.getSensors({identifier: $stateParams.id}).$promise.then(
+  Node.getSensors({id: $stateParams.id}).$promise.then(
     function success(data) {
       angular.forEach(data.sensors, function(sensor) {
         sensor.edit = false;

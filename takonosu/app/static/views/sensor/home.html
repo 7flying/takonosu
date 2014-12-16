@@ -4,7 +4,7 @@
         <div ng-show="newSensor" class="panel panel-default">
             <form>
                 <div class="panel-heading">
-                    <span><input value="{{sensor.name}}" type="text" class="form-control" placeholder="Name" ng-model="sensor.name"></span>
+                    <span><input type="text" class="form-control" placeholder="Name" ng-model="newSensorName"></span>
                 </div>
                     <div class="panel-body">
                         <table class="table">
@@ -15,10 +15,10 @@
                                 <th>Rate</th>
                             </tr>
                             <tr>
-                                <td><input required type="text" class="form-control" placeholder="Signal" ng-model="sensor.signal"></td>
-                                <td><input required type="text" class="form-control" placeholder="Pin" type="number" ng-model="sensor.pin"></td>
-                                <td><input required type="text" class="form-control" placeholder="Direction" ng-model="sensor.direction"></td>  
-                                <td><input type="text" class="form-control" placeholder="Rate" ng-model="sensor.refresh"></td>
+                                <td><input required type="text" class="form-control" placeholder="Signal" ng-model="newSensorSignal"></td>
+                                <td><input required type="text" class="form-control" placeholder="Pin" type="number" ng-model="newSensorPin"></td>
+                                <td><input required type="text" class="form-control" placeholder="Direction" ng-model="newSensorDirection"></td>  
+                                <td><input type="text" class="form-control" placeholder="Rate" ng-model="newSensorRefesh"></td>
                             </tr>
                         </table>
                     </div>

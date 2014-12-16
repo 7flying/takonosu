@@ -190,14 +190,14 @@ class NodeSensorsAPI(Resource):
 
 	def get(self):
 		""" Gets all the sensors of a certain node. """
-		args = reqparse.parse_args()
+		args =  self.reqparse.parse_args()
 		if args['id'] != None:
 			sensors = manager.get_sensors(args['id'])
 			return jsonify(sensors=sensors)
 
 	def post(self):
 		""" Inserts a sensor to the node. """
-		args = reqparse.parse_args()
+		args =  self.reqparse.parse_args()
 		if args['id'] == None or len(args['id']) < 0:
 			abort(400)
 		else:
@@ -212,7 +212,7 @@ class NodeSensorsAPI(Resource):
 
 	def delete(self):
 		""" Deletes a sensor from a node. """
-		args = reqparse.parse_args()
+		args =  self.reqparse.parse_args()
 		if args['id'] != None and args['sensor_id'] != None:
 			managet.delete_sensor_from_node(args['id'], args['sensor_id'])
 			return jsonify(message="Sensor deleted from node", code=201)

@@ -21,7 +21,7 @@ angular.module('flagular')
     if($scope.newSensor) {
       $scope.newSensor = false;
       Node.createSensor({
-        "identifier": $stateParams.id,
+        "id": $stateParams.id,
         "name": $scope.newSensorName,
         "signal": $scope.newSensorSignal,
         "pin": $scope.newSensorPin,

@@ -179,14 +179,14 @@ class NodeSensorsAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('identifier', type=int, location='form')
-		self.reqparse.add_argument('id', type=int, required=True) # NODE id
-		self.reqparse.add_argument('sensor_id', type=int, location='form')
-		self.reqparse.add_argument('name', type=str, location='form')
-		self.reqparse.add_argument('signal', type=str, location='form')
-		self.reqparse.add_argument('pin', type=int, location='form')
-		self.reqparse.add_argument('direction', type=str, location='form')
-		self.reqparse.add_argument('refresh', type=int, location='form')
+		self.reqparse.add_argument('identifier', type=int)
+		self.reqparse.add_argument('id', type=int) # NODE id
+		self.reqparse.add_argument('sensor_id', type=int)
+		self.reqparse.add_argument('name', type=str)
+		self.reqparse.add_argument('signal', type=str)
+		self.reqparse.add_argument('pin', type=int)
+		self.reqparse.add_argument('direction', type=str)
+		self.reqparse.add_argument('refresh', type=int)
 		super(NodeSensorsAPI, self).__init__()
 
 	def get(self):
@@ -200,6 +200,7 @@ class NodeSensorsAPI(Resource):
 		""" Inserts a sensor to the node. """
 		args =  self.reqparse.parse_args()
 		if args['id'] == None:
+			print "abortando"
 			abort(400)
 		else:
 			sensor = {}

@@ -179,6 +179,7 @@ class NodeSensorsAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
+		self.reqparse.add_argument('identifier', type=int, location='form')
 		self.reqparse.add_argument('id', type=int, required=True) # NODE id
 		self.reqparse.add_argument('sensor_id', type=int, location='form')
 		self.reqparse.add_argument('name', type=str, location='form')

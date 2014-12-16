@@ -179,6 +179,7 @@ class NodeSensorsAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
+		self.reqparse.add_argument('id', type=int, required=True) # NODE id
 		self.reqparse.add_argument('sensor_id', type=int, location='form')
 		self.reqparse.add_argument('name', type=str, location='form')
 		self.reqparse.add_argument('signal', type=str, location='form')
@@ -187,29 +188,34 @@ class NodeSensorsAPI(Resource):
 		self.reqparse.add_argument('refresh', type=int, location='form')
 		super(NodeSensorsAPI, self).__init__()
 
-	def get(self, id):
+	def get(self):
 		""" Gets all the sensors of a certain node. """
-		sensors = manager.get_sensors(id)
-		return jsonify(sensors=sensors)
+		args = reqparse.parse_args()
+		if args['id'] != None:
+			sensors = manager.get_sensors(args['id'])
+			return jsonify(sensors=sensors)
 
-	def post(self, id):
+	def post(self):
 		""" Inserts a sensor to the node. """
 		args = reqparse.parse_args()
-		sensor = {}
-		sensor['name'] = args['name']
-		sensor['signal'] = args['signal']
-		sensor['pin'] = args['pin']
-		sensor['direction'] = args['direction']
-		sensor['refresh'] = args['refresh']
-		manager.insert_sensor_to_node(id, sensor)
-		return jsonify(message="Sensor inserted to node", code=201)
+		if args['id'] == None or len(args['id']) < 0:
+			abort(400)
+		else:
+			sensor = {}
+			sensor['name'] = args['name']
+			sensor['signal'] = args['signal']
+			sensor['pin'] = args['pin']
+			sensor['direction'] = args['direction']
+			sensor['refresh'] = args['refresh']
+			manager.insert_sensor_to_node(args['id'], sensor)
+			return jsonify(message="Sensor inserted to node", code=201)
 
-	def delete(self, id):
+	def delete(self):
 		""" Deletes a sensor from a node. """
 		args = reqparse.parse_args()
-		if args['sensor_id'] != None:
-			managet.delete_sensor_from_node(id, args['sensor_id'])
+		if args['id'] != None and args['sensor_id'] != None:
+			managet.delete_sensor_from_node(args['id'], args['sensor_id'])
 			return jsonify(message="Sensor deleted from node", code=201)
 
-api.add_resource(NodeSensorsAPI, '/takonosu/api/nodes/<int:id>/sensors',
+api.add_resource(NodeSensorsAPI, '/takonosu/api/nodes/sensors',
 	endpoint='sensors')

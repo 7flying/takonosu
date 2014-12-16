@@ -11,29 +11,37 @@ angular.module('flagular')
   	};
 
   	$scope.updateNode = function(node) {
-  		Node.update({
-  			"id": node.id,
-  			"board_type": node.board_type,
-  			"name": node.name,
-  			"nic": node.nic
-  		}, function() {
+      Node.updateNode({
+        "id": node.id,
+        "board_type": node.board_type,
+        "nic": node.nic,
+        "name": node.name
+        }, function() {
   			node.edit = false;
   		});
   	}
 
     $scope.createNode = function() {
-      console.log("on node create, value: " + $scope.newNode);
-      if($scope.newNode)
+      if($scope.newNode) {
         $scope.newNode = false;
-      else
+        Node.createNode({
+          "name": $scope.newNodeName,
+          "board_type": $scope.newNodeBoard_type,
+          "nic": $scope.newNodeNic
+        }, function (data) {
+          console.log(data);
+        });
+      } else
         $scope.newNode = true;
     }
 
      $scope.removeNode = function(index) {
     if(confirm("Are you sure you want to remove this node?")) {
-      console.log('removed');
-      $scope.nodes.splice(index, 1);
-      //Call server to upload removal.
+      console.log(index);
+      console.log($scope.nodes[index].id);
+      Node.deleteNode({"id": $scope.nodes[index].id}, function() {
+        $scope.nodes.splice(index, 1);
+      });
       if($scope.nodes.length == 0) {
         $scope.newNode = true;
       }

@@ -35,7 +35,7 @@ angular.module('flagular')
     }
   }
 
-  Node.getSensors({id: $stateParams.id}).$promise.then(
+  Node.getSensors({identifier: $stateParams.id}).$promise.then(
     function success(data) {
       angular.forEach(data.sensors, function(sensor) {
         sensor.edit = false;

@@ -5,7 +5,7 @@
             <div ng-show="newNode" class="panel panel-default">
                 <form class="thing-form">
                     <div class="panel-heading">
-                        <span><input value="{{node.name}}" type="text" class="form-control" placeholder="Node name" ng-model="node.name"></span>
+                        <span><input type="text" class="form-control" placeholder="Node name" ng-model="newNodeName"></span>
                     </div>
                     <div class="panel-body">
                         <table class="table">
@@ -15,8 +15,8 @@
                                 <th># Sensors</th>
                             </tr>
                             <tr>
-                                <td><input value="{{node.board_type}}" type="text" class="form-control" placeholder="Board type" ng-model="node.board_type"></td>
-                                <td><input value="{{node.nic}}" type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="node.nic"></td>
+                                <td><input type="text" class="form-control" placeholder="Board type" ng-model="newNodeBoard_type"></td>
+                                <td><input type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="newNodeNic"></td>
                                 <td>{{node.sensors.length}}</td>
                             </tr>
                         </table>
@@ -79,6 +79,6 @@
     </div>
     <div class="col-md-4">
         <h2>Options</h2>
-        <button class="btn btn-default" type="button" ng-click="createNode()">Add node to 🐙の巣</button>
+        <button class="btn btn-default" type="button" ng-click="createNode()">Add node to 蛸の巣</button>
     </div>
 </div>

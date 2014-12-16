@@ -116,10 +116,10 @@ class NodesAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('id', type=int, location='form')
-		self.reqparse.add_argument('name', type=str, location='form')
-		self.reqparse.add_argument('board_type', type=str, location='form')
-		self.reqparse.add_argument('nic', type=str, location='form')
+		self.reqparse.add_argument('id', type=int)
+		self.reqparse.add_argument('name', type=str)
+		self.reqparse.add_argument('board_type', type=str)
+		self.reqparse.add_argument('nic', type=str)
 		super(NodesAPI, self).__init__()
 
 	def get(self):
@@ -135,6 +135,7 @@ class NodesAPI(Resource):
 			abort(400)	
 	def post(self):
 		""" Creates a new node."""
+		args = self.reqparse.parse_args()
 		node = {}
 		node['name'] = args['name']
 		node['board_type'] = args['board_type']

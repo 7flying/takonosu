@@ -2,8 +2,8 @@
 //blah
 angular.module('flagular')
   .factory('Node', function ($resource) {
-    return $resource('/takonosu/api/nodes/:id/:sensors', {
-      id: '@id',
+    return $resource('/takonosu/api/nodes/:identifier/:sensors', {
+      id: '@identifier',
       sensors: '@sensors'
     },
     {
@@ -25,6 +25,12 @@ angular.module('flagular')
         params: {
           sensors: 'sensors'
         }
+      }, 
+      deleteNode: {
+        method: 'DELETE'
+      },
+      createNode: {
+        method: 'POST'
       }
 	  });
   });

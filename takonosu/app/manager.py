@@ -103,11 +103,8 @@ def delete_node(id):
 	Deletes a node from the db as well as all the sensors related to the node.
 	"""
 	id = str(id)
-	print "Delete node id: " + id
-	print "Set: " + str(db.smembers(KEY_LIST_SENSORS_IN_NODE + id))
 	sensors = set(db.smembers(KEY_LIST_SENSORS_IN_NODE + id))
 	for id_sensor in sensors:
-		print "id sensor: " + id_sensor
 		delete_sensor_from_node(id, id_sensor)
 	db.delete(KEY_LIST_SENSORS_IN_NODE + id)
 	db.delete(KEY_NODES + id)
@@ -122,10 +119,11 @@ def modify_node(new_node):
 def get_node(node_id):
 	""" Returns the node given the id, as well as all its sensors. """
 	node = db.hgetall(KEY_NODES + str(node_id))
-	print node
 	sensors = get_sensors(node_id)
 	if sensors and len(sensors) > 0:
 		node[N_SENSORS] = sensors
+	else:
+		node[N_SENSORS] = []
 	return node
 
 def get_nodes():
@@ -143,13 +141,19 @@ def get_sensors(node_id):
 	sensors = []
 	for sensor_id in db.smembers(KEY_LIST_SENSORS_IN_NODE + str(node_id)):
 		sensor = get_sensor(sensor_id)
+		if sensor['id'] == 0:
+			sensor = None
 		if sensor != None:
 			sensors.append(sensor)
 	return sensors
 
 def get_sensor(sensor_id):
 	""" Gets a sensor given its id. """
-	return db.hgetall(KEY_SENSORS + str(sensor_id))
+	data = db.hgetall(KEY_SENSORS + str(sensor_id))
+	if data['id'] == None:
+		return None
+	else:
+		return data
 
 def _insert_sensor(sensor):
 	"""
@@ -172,7 +176,6 @@ def insert_sensor_to_node(node_id, sensor):
 
 def delete_sensor_from_node(node_id, sensor_id):
 	""" Deletes a sensor from the node."""
-	print "-Delete sensor from node. Node id: " + str(node_id) + " sensor_id: " + sensor_id
 	db.srem(KEY_LIST_SENSORS_IN_NODE + str(node_id), str(sensor_id))
 	db.delete(KEY_SENSORS + str(sensor_id))
 

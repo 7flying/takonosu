@@ -199,7 +199,7 @@ class NodeSensorsAPI(Resource):
 	def post(self):
 		""" Inserts a sensor to the node. """
 		args =  self.reqparse.parse_args()
-		if args['id'] == None or len(args['id']) < 0:
+		if args['id'] == None:
 			abort(400)
 		else:
 			sensor = {}
@@ -208,6 +208,7 @@ class NodeSensorsAPI(Resource):
 			sensor['pin'] = args['pin']
 			sensor['direction'] = args['direction']
 			sensor['refresh'] = args['refresh']
+			print "insert sensor: " + str(sensor)
 			manager.insert_sensor_to_node(args['id'], sensor)
 			return jsonify(message="Sensor inserted to node", code=201)
 

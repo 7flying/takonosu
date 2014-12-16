@@ -116,10 +116,10 @@ class NodesAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('id', type=int)
-		self.reqparse.add_argument('name', type=str)
-		self.reqparse.add_argument('board_type', type=str)
-		self.reqparse.add_argument('nic', type=str)
+		self.reqparse.add_argument('id', type=int, location='form')
+		self.reqparse.add_argument('name', type=str, location='form')
+		self.reqparse.add_argument('board_type', type=str, location='form')
+		self.reqparse.add_argument('nic', type=str, location='form')
 		super(NodesAPI, self).__init__()
 
 	def get(self):
@@ -178,12 +178,12 @@ class NodeSensorsAPI(Resource):
 
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('sensor_id', type=int)
-		self.reqparse.add_argument('name', type=str)
-		self.reqparse.add_argument('signal', type=str)
-		self.reqparse.add_argument('pin', type=int)
-		self.reqparse.add_argument('direction', type=str)
-		self.reqparse.add_argument('refresh', type=int)
+		self.reqparse.add_argument('sensor_id', type=int, location='form')
+		self.reqparse.add_argument('name', type=str, location='form')
+		self.reqparse.add_argument('signal', type=str, location='form')
+		self.reqparse.add_argument('pin', type=int, location='form')
+		self.reqparse.add_argument('direction', type=str, location='form')
+		self.reqparse.add_argument('refresh', type=int, location='form')
 		super(NodeSensorsAPI, self).__init__()
 
 	def get(self, id):

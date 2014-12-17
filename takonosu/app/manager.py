@@ -69,7 +69,14 @@ def populate():
 	sensor[S_PIN] = '7'
 	sensor[S_DIRECTION] = 'W'
 	sensor[S_REFRESH] = 1000
+	sensor2 = {}
+	sensor2[S_NAME] = 'TESTING sensor2'
+	sensor2[S_SIGNAL] = 'A'
+	sensor2[S_PIN] = '1'
+	sensor2[S_DIRECTION] = 'R'
+	sensor2[S_REFRESH] = 10000
 	sensors.append(sensor)
+	sensors.append(sensor2)
 	node[N_SENSORS] = sensors
 	insert_node(node)
 	print "[ MANAGER ]: Test data added."

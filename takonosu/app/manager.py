@@ -34,6 +34,7 @@ S_REFRESH	= 'refresh'
 def populate():
 	""" Test data """
 	db.flushdb()
+	"""
 	print "[ MANAGER ]: Inserting test data"
 	nic = ['Bluetooth', 'Wifi', 'Xbee']
 	boards = ['Arduino UNO', 'Arduino Nano', 'Arduino Micro', 'BeagleBone Black',
@@ -56,6 +57,21 @@ def populate():
 			sensors.append(sensor)
 		node[N_SENSORS] = sensors
 		insert_node(node)
+	"""
+	node = {}
+	node[N_NAME] = "Testing Node "
+	node[N_BOARD] = 'Arduino Uno'
+	node[N_NIC] = 'Bluetooth'
+	sensors = []
+	sensor = {}
+	sensor[S_NAME] = 'TESTING SENSOR'
+	sensor[S_SIGNAL] = 'D'
+	sensor[S_PIN] = '7'
+	sensor[S_DIRECTION] = 'W'
+	sensor[S_REFRESH] = 1000
+	sensors.append(sensor)
+	node[N_SENSORS] = sensors
+	insert_node(node)
 	print "[ MANAGER ]: Test data added."
 	
 

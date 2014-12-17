@@ -21,6 +21,8 @@ api = Api(app)
 # Redis database
 db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+serial_connections = {}
+
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
 	data_field = {
@@ -63,15 +65,15 @@ class DataAPI(Resource):
 					elif node['nic'] == 'Bluetooth':
 						port = BLUE_PORT
 						rate = BLUE_RATE
-					serial = Connection(port, rate)
+					if serial_connections[BLUE_PORT] == None:
+						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('R' + sensor['signal'] + pin + 'X')
+					serial_connections[BLUE_PORT].write('R' + sensor['signal'] + pin + 'X')
 					time.sleep(1)
-					result = serial.read()
+					result = serial_connections[BLUE_PORT].read()
 					ret = {}
 					ret['result'] = result
 					ret['unit'] = "aguachuwe"
-					serial.close()
 					return {'data': marshal(ret, DataAPI.data_field)}
 
 	def put(self):
@@ -101,11 +103,10 @@ class DataAPI(Resource):
 					elif node['nic'] == 'Bluetooth':
 						port = BLUE_PORT
 						rate = BLUE_RATE
-					serial = Connection(port, rate)
+					if serial_connections[BLUE_PORT] == None:
+						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('W' + sensor['signal'] + pin + args['data'] + 'X')
-					time.sleep(	1)
-					serial.close()
+					serial_connections[BLUE_PORT].write('W' + sensor['signal'] + pin + args['data'] + 'X')
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 

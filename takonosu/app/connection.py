@@ -19,11 +19,12 @@ class Connection(object):
 			if int(time.time()) - init > 1000:
 				end = True
 			else:
-				temp = self.serial.read(1)
-				if temp == 'X':
-					end = True
-				else:
-					ret += temp 
+				if self.serial.inWaiting() > 0:
+					temp = self.serial.read(1)
+					if temp == 'X':
+						end = True
+					else:
+						ret += temp 
 		# result = self.serial.read(10)
 		print ret
 

@@ -3,6 +3,8 @@ angular.module('flagular')
   
   $scope.nodes = [];
   $scope.newNode = false;
+  $scope.newNodeBoard_type = 'None';
+
 	$scope.editNode = function(node) {
   		if(node.edit)
   			node.edit = false;

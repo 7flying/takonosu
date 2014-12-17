@@ -15,9 +15,18 @@
                                 <th># Sensors</th>
                             </tr>
                             <tr>
-                                <td><input type="text" class="form-control" placeholder="Board type" ng-model="newNodeBoard_type"></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        Board Type: {{newNodeBoard_type}}<span class="caret"></span>
+                                        </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a ng-click="boardSelect()" href="#">Arduino Uno</a></li>
+                                                <li><a ng-click="boardSelect()" href="#">Waspmote v1.1</a></li>
+                                            </ul>
+                                    </div>
                                 <td><input type="text" class="form-control" placeholder="Node Network Interface Controller" ng-model="newNodeNic"></td>
-                                <td>{{node.sensors.length}}</td>
+                                <td>0</td>
                             </tr>
                         </table>
                     </div>

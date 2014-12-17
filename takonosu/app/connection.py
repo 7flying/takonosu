@@ -11,7 +11,7 @@ class Connection(object):
 		self.serial.close()
 
 	def read(self):
-		result = self.readLine()
+		result = self.serial.readline()
 		print result
 
 	def write(self, command):

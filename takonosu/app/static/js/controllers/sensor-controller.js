@@ -45,6 +45,17 @@ angular.module('flagular')
         "direction": $scope.newSensorDirection,
         "refresh": $scope.newSensorRefesh
       }, function (data) {
+        if($scope.newSensorDirection == 'R') {
+          setInterval(function() {
+            SensorData.getData({
+              "node": $stateParams.id,
+              "sensor": sensor.id
+            },function (datainfo) {
+              data.sensor.in = datainfo.data.value + ' ' + datainfo.data.unit;
+              console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
+            });
+          }, $scope.newSensorRefesh);
+        }
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = '';
@@ -80,7 +91,10 @@ angular.module('flagular')
           $scope.sensors = data.sensors;
           if(sensor.direction === 'R')
           setInterval(function() {
-            SensorData.getData(function (data) {
+            SensorData.getData({
+              "node": $stateParams.id,
+              "sensor": sensor.id
+            },function (data) {
               sensor.in = data.data.value + ' ' + data.data.unit;
               console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
             });

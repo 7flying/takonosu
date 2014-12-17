@@ -171,6 +171,7 @@ def insert_sensor_to_node(node_id, sensor):
 	""" Adds a new sensor to the node. """
 	sensor_id = _insert_sensor(sensor)
 	db.sadd(KEY_LIST_SENSORS_IN_NODE + str(node_id), sensor_id)
+	return sensor_id
 
 def delete_sensor_from_node(node_id, sensor_id):
 	""" Deletes a sensor from the node."""

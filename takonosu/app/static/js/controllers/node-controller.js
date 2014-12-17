@@ -4,6 +4,16 @@ angular.module('flagular')
   $scope.nodes = [];
   $scope.newNode = false;
   $scope.newNodeBoard_type = 'None';
+  $scope.newNodeNic = 'None';
+
+  $scope.boardSelect = function(name) {
+    $scope.newNodeBoard_type = name;
+    if(name == 'Arduino Uno') {
+      $scope.newNodeNic = 'Bluetooth'
+    } else {
+      $scope.newNodeNic = 'ZigBee'
+    }
+  }
 
 	$scope.editNode = function(node) {
   		if(node.edit)
@@ -22,7 +32,7 @@ angular.module('flagular')
   			node.edit = false;
   		});
   	}
-
+    
      $scope.createNewNode = function() {
       if($scope.newNode) {
         $scope.newNode = false;

@@ -6,6 +6,9 @@ angular.module('flagular')
     {
       getData: {
         method: 'GET'
+      },
+      sendData: {
+      	method: 'PUT'
       }
-	  });
+	});
   });

@@ -4,13 +4,23 @@ angular.module('flagular')
   $scope.sensors = [];
   tempSensors = [];
   $scope.editSensor = function(index) {
-      if($scope.sensors[index].edit) {
-          $scope.sensors[index].edit = false;
-          $scope.sensors[index] = tempSensors[index];
-      }
-      else
-        $scope.sensors[index].edit = true;
-    };
+    if($scope.sensors[index].edit) {
+        $scope.sensors[index].edit = false;
+        $scope.sensors[index] = tempSensors[index];
+    }
+    else
+      $scope.sensors[index].edit = true;
+  }
+
+  $scope.sendData = function(sensor) {
+    SensorData.sendData({
+      'node': $stateParams.id,
+      'sensor': sensor.id,
+      'data': sensor.out
+    }, function() {
+      sensor.out = '';
+    });
+  }
 
   $scope.updateSensor = function(sensor) {
     sensor.edit = false;

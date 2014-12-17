@@ -122,7 +122,7 @@ def get_node(node_id):
 	sensors = get_sensors(node_id)
 	if sensors and len(sensors) > 0:
 		node[N_SENSORS] = sensors
-	else:
+	elif node:
 		node[N_SENSORS] = []
 	return node
 

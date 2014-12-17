@@ -29,6 +29,12 @@ angular.module('flagular')
       deleteNode: {
         method: 'DELETE'
       },
+      deleteSensor: {
+        method: 'DELETE',
+        params: {
+          sensors: 'sensors'
+        }
+      },
       createNode: {
         method: 'POST'
       },

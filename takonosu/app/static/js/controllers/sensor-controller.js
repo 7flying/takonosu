@@ -27,6 +27,13 @@ angular.module('flagular')
         "pin": $scope.newSensorPin,
         "direction": $scope.newSensorDirection,
         "refresh": $scope.newSensorRefesh
+      }, function (data) {
+        console.log(data);
+        $scope.newSensorName = '';
+        $scope.newSensorSignal = '';
+        $scope.newSensorPin = '';
+        $scope.newSensorDirection = '';
+        $scope.newSensorRefesh = '';
       });
     } else
       $scope.newSensor = true;
@@ -34,12 +41,16 @@ angular.module('flagular')
 
   $scope.removeSensor = function(index) {
     if(confirm("Are you sure you want to remove this sensor?")) {
-      console.log('removed');
-      $scope.sensors.splice(index, 1);
-      //Call server to upload removal.
-      if($scope.sensors.length == 0) {
-        $scope.newSensor = true;
-      }
+      console.log($scope.sensors[index]);
+      Node.deleteSensor({
+        "sensor_id": $scope.sensors[index].id,
+        "id": $stateParams.id
+      }, function() {
+        $scope.sensors.splice(index, 1);
+        if($scope.sensors.length == 0) {
+          $scope.newSensor = true;
+        }
+      });
     }
   }
 

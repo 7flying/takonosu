@@ -217,7 +217,7 @@ class NodeSensorsAPI(Resource):
 		""" Deletes a sensor from a node. """
 		args =  self.reqparse.parse_args()
 		if args['id'] != None and args['sensor_id'] != None:
-			managet.delete_sensor_from_node(args['id'], args['sensor_id'])
+			manager.delete_sensor_from_node(args['id'], args['sensor_id'])
 			return jsonify(message="Sensor deleted from node", code=201)
 
 api.add_resource(NodeSensorsAPI, '/takonosu/api/nodes/sensors',

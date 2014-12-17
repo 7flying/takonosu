@@ -68,8 +68,8 @@ class DataAPI(Resource):
 					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial_connections[BLUE_PORT].write('R' + sensor['signal'] + pin + 'X')
-					time.sleep(1)
+					serial_connections[BLUE_PORT].write('R' + sensor['signal'] + pin + 'X' + '\n')
+					#time.sleep(1)
 					result = serial_connections[BLUE_PORT].read()
 					ret = {}
 					ret['result'] = result

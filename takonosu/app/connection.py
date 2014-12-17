@@ -11,8 +11,16 @@ class Connection(object):
 		self.serial.close()
 
 	def read(self):
-		result = self.serial.readline()
-		print result
+		end = False
+		ret = ''
+		while not end:
+			temp = self.serial.read(1)
+			if temp == 'X':
+				end = True
+			else:
+				ret += temp 
+		# result = self.serial.read(10)
+		print ret
 
 	def write(self, command):
 		print command

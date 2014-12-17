@@ -52,12 +52,14 @@ void process(void) {
       err = 1;
   }
   // Echo the command  
-  for (uint8_t i = 0; i<10; i++)
+  /*for (uint8_t i = 0; i<10; i++)
     Serial.print(buffer[i]);
+    */
   // Data
-  if (buffer[0] == 'R' && !err && !isnan(reading))
+  if (buffer[0] == 'R' && !err && !isnan(reading)) {
     Serial.print(reading);
-  Serial.println();
+    Serial.print('X');
+  }
 }
 
 void loop(void) {
@@ -65,6 +67,7 @@ void loop(void) {
     char command = Serial.read();
     if(command == 'X') {
       buffer[buffInd] = 'X';
+      buffer[buffInd + 1] = '\n';
       buffInd = 0;
       process();
     } else {

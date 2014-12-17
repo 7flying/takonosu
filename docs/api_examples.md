@@ -1,52 +1,32 @@
 
+#Sensor resource
+
+```
+/takonosu/api/sensor
+```
+
+* GET, {id:int}: Gets a sensor by its id
+* PUT, {id:int, name:str, signal:str, pin:id, direction:str, refresh:int}
+
+
 #Node resource
 
-* Obtain a node by its id:
-  curl -X GET http://localhost:5000/takonosu/api/node -d "id=3"
-  Response:
-  	{
-    	"node": {
-        	"board_type": "Arduino UNO", 
-        	"id": 3, 
-        	"name": "Super Node Zero", 
-        	"nic": "Bluetooth", 
-        	"sensors": [
-        	    {
-            	    "AD": "D", 
-            	    "id": 3, 
-            	    "name": "TMP36", 
-            	    "pin": 5, 
-            	    "refresh": 3000, 
-            	    "type": "R"
-            	}
-        	]
-    	}
-	}
+```
+/takonosu/api/nodes
+```
 
-* Create a new node:
-  curl -X POST http://localhost:5000/takonosu/api/node -d "board_type=Arduino" -d "name=SUPER NODEEEE" -d "nic=Wifi"
-  
-  Response success:
-  {
-    "node": {
-        "board_type": "Arduino", 
-        "id": 1, 
-        "name": "SUPER NODEEEE", 
-        "nic": "Wifi", 
-        "sensors": []
-    }
-  }
+* GET,    {id:int} : Gets a node by its id 
+          {}        : Gets all the nodes
+* POST,   {name:str, board_type:str, nic:str}: inserts a node
+* PUT,    {id:int, name:str, board_type:str, nic:str}: edits a node
+* DELETE, {id:int}  : deletes a node
 
-  Response error:
-  {
- 	 "code": 501, 
- 	 "message": "DB error."
-  }
+#Node-sensors resource
 
-* Modify an existing node:
-  curl -X POST http://localhost:5000/takonosu/api/node -d "id=1" -d "board_type=Arduino" -d "name=SUPER NODEEEE" -d "nic=Wifi"
+```
+/takonosu/api/nodes/<int:id>/sensors
+```
 
-
-
-
-
+* GET,    gets all the sensors of a node
+* POST,   {name:str, signal:str, pin:int, direction:str, refresh:int}:  Inserts a sensor to a node
+* DELETE, {sensor_id:int}: deletes a sensor from a node

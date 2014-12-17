@@ -42,6 +42,7 @@ class DataAPI(Resource):
 				sensor: the sensor to get data from
 		"""
 		args = self.reqparse.parse_args()
+		print args
 		if args['node'] != None and args['sensor'] != None:
 			# From node select nic
 			node = manager._get_node(args['node'])
@@ -81,6 +82,7 @@ class DataAPI(Resource):
 				data: the data to be sent
 		"""
 		args = self.reqparse.parse_args()
+		print args
 		if args['node'] != None and args['sensor'] != None and args['data']:
 			# From node select nic
 			node = manager._get_node(args['node'])

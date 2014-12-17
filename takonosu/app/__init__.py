@@ -42,6 +42,7 @@ class DataAPI(Resource):
 				sensor: the sensor to get data from
 		"""
 		args = self.reqparse.parse_args()
+		print args
 		if args['node'] != None and args['sensor'] != None:
 			# From node select nic
 			node = manager._get_node(args['node'])
@@ -64,7 +65,7 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('R' + sensor['signal'] + pin)
+					serial.write('R' + sensor['signal'] + pin + 'X')
 					time.sleep(1)
 					result = serial.read()	
 					ret = {}
@@ -80,6 +81,7 @@ class DataAPI(Resource):
 				data: the data to be sent
 		"""
 		args = self.reqparse.parse_args()
+		print args
 		if args['node'] != None and args['sensor'] != None and args['data']:
 			# From node select nic
 			node = manager._get_node(args['node'])
@@ -100,7 +102,7 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('W' + sensor['signal'] + pin)
+					serial.write('W' + sensor['signal'] + pin + 'X')
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 

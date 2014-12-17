@@ -7,6 +7,8 @@ app.config.from_object('config')
 from app.routes import index
 
 from datetime import datetime
+from multiprocessing.pool import ThreadPool
+from threading import Thread
 import time
 from flask import Flask, abort, jsonify, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
@@ -21,7 +23,19 @@ api = Api(app)
 # Redis database
 db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+# Serial port management
 serial_connections = {}
+pool = ThreadPool(processes=3)
+
+
+def serial_read(command, serial_con, queue):
+	serial_con.write(command)
+	result = serial_con.read()
+	queue.put(result)
+	
+
+def serial_write(command, serial_con):
+	serial_con.write(command)
 
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
@@ -68,12 +82,20 @@ class DataAPI(Resource):
 					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial_connections[BLUE_PORT].write('R' + sensor['signal'] + pin + 'X' + '\n')
-					#time.sleep(1)
-					result = serial_connections[BLUE_PORT].read()
+					command = 'R' + sensor['signal'] + pin + 'X' + '\n'
 					ret = {}
-					ret['result'] = result
 					ret['unit'] = "aguachuwe"
+					# Option 1
+					"""
+					async_result = pool.apply_async(serial_read, (command, serial_connections[BLUE_PORT]))
+					ret['result'] = async_result
+					"""
+					# Option 2
+					queue = Queue()
+					t = Thread(target=serial_read, args=(command, serial_connections[BLUE_PORT], queue))
+					t.start()
+					result = queue.get()
+					ret['result'] = result
 					return {'data': marshal(ret, DataAPI.data_field)}
 
 	def put(self):
@@ -106,7 +128,9 @@ class DataAPI(Resource):
 					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial_connections[BLUE_PORT].write('W' + sensor['signal'] + pin + args['data'] + 'X')
+					command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
+					thread = Thread(target=serial_write, args=(command, serial_connections[BLUE_PORT]))
+					thread.start()
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 

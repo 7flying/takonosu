@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import serial
+import time
 
 class Connection(object):
 	
@@ -11,14 +12,18 @@ class Connection(object):
 		self.serial.close()
 
 	def read(self):
+		init = int(time.time())
 		end = False
 		ret = ''
 		while not end:
-			temp = self.serial.read(1)
-			if temp == 'X':
+			if int(time.time()) - init > 1000:
 				end = True
 			else:
-				ret += temp 
+				temp = self.serial.read(1)
+				if temp == 'X':
+					end = True
+				else:
+					ret += temp 
 		# result = self.serial.read(10)
 		print ret
 

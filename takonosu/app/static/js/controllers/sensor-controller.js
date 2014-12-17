@@ -56,17 +56,21 @@ angular.module('flagular')
 
   Node.getSensors({id: $stateParams.id}).$promise.then(
     function success(data) {
-      angular.forEach(data.sensors, function(sensor) {
-        sensor.edit = false;
-        $scope.sensors = data.sensors;
-        tempSensors = JSON.parse(JSON.stringify($scope.sensors));
-        if(sensor.direction === 'R')
-        setInterval(function() {
-          SensorData.getData(function (data) {
-            sensor.in = data.data.value + ' ' + data.data.unit;
-            console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
-          });
-        }, sensor.refresh);
-      });
+      if(data.sensors.length == 0) {
+        $scope.newSensor = true;
+      } else {
+        angular.forEach(data.sensors, function(sensor) {
+          sensor.edit = false;
+          $scope.sensors = data.sensors;
+          tempSensors = JSON.parse(JSON.stringify($scope.sensors));
+          if(sensor.direction === 'R')
+          setInterval(function() {
+            SensorData.getData(function (data) {
+              sensor.in = data.data.value + ' ' + data.data.unit;
+              console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
+            });
+          }, sensor.refresh);
+        });
+      }
     });
   });

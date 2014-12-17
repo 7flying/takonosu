@@ -21,6 +21,14 @@ angular.module('flagular')
   		});
   	}
 
+     $scope.createNewNode = function() {
+      if($scope.newNode) {
+        $scope.newNode = false;
+      } else {
+        $scope.newNode = true;
+      }
+     }
+
     $scope.createNode = function() {
       if($scope.newNode) {
         $scope.newNode = false;
@@ -30,6 +38,9 @@ angular.module('flagular')
           "nic": $scope.newNodeNic
         }, function (data) {
           $scope.nodes.push(data.node);
+          $scope.newNodeName = '';
+          $scope.newNodeBoard_type = '';
+          $scope.newNodeNic = '';
         });
       } else
         $scope.newNode = true;
@@ -39,18 +50,23 @@ angular.module('flagular')
     if(confirm("Are you sure you want to remove this node?")) {
       Node.deleteNode({"id": $scope.nodes[index].id}, function() {
         $scope.nodes.splice(index, 1);
+        if($scope.nodes.length == 0) {
+          $scope.newNode = true;
+        }
       });
-      if($scope.nodes.length == 0) {
-        $scope.newNode = true;
-      }
     }
   }
 
-  	Node.query().$promise.then(
-    	function success(data) {
-    		angular.forEach(data.nodes, function(node) {
+	Node.query().$promise.then(
+  	function success(data) {
+  		if(data.nodes.length == 0) {
+        $scope.newNode = true;
+      } else {
+        angular.forEach(data.nodes, function(node) {
           node.edit = false;
           $scope.nodes = data.nodes;
         });
-    	});
-  	});
+      }
+    });
+  
+});

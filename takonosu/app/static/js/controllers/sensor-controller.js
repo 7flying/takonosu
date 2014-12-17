@@ -16,8 +16,15 @@ angular.module('flagular')
     sensor.edit = false;
   }
 
+  $scope.createNewSensor = function() {
+    if($scope.newSensor) {
+      $scope.newSensor = false;
+    } else {
+      $scope.newSensor = true;
+    }
+  }
+
   $scope.createSensor = function() {
-    console.log("on sensor create, value: " + $scope.newSensor);
     if($scope.newSensor) {
       $scope.newSensor = false;
       Node.createSensor({
@@ -28,7 +35,7 @@ angular.module('flagular')
         "direction": $scope.newSensorDirection,
         "refresh": $scope.newSensorRefesh
       }, function (data) {
-        console.log(data);
+        $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = '';
         $scope.newSensorPin = '';
@@ -41,7 +48,6 @@ angular.module('flagular')
 
   $scope.removeSensor = function(index) {
     if(confirm("Are you sure you want to remove this sensor?")) {
-      console.log($scope.sensors[index]);
       Node.deleteSensor({
         "sensor_id": $scope.sensors[index].id,
         "id": $stateParams.id
@@ -62,7 +68,6 @@ angular.module('flagular')
         angular.forEach(data.sensors, function(sensor) {
           sensor.edit = false;
           $scope.sensors = data.sensors;
-          tempSensors = JSON.parse(JSON.stringify($scope.sensors));
           if(sensor.direction === 'R')
           setInterval(function() {
             SensorData.getData(function (data) {

@@ -211,7 +211,7 @@ class NodeSensorsAPI(Resource):
 			sensor['refresh'] = args['refresh']
 			print "insert sensor: " + str(sensor)
 			new_sensor_id = manager.insert_sensor_to_node(args['id'], sensor)
-			return manager.get_sensor(new_sensor_id)
+			return jsonify(sensor=manager.get_sensor(new_sensor_id))
 
 	def delete(self):
 		""" Deletes a sensor from a node. """

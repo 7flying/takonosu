@@ -64,12 +64,13 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('R' + sensor['signal'] + pin)
+					serial.write('R' + sensor['signal'] + pin + 'X')
 					time.sleep(1)
-					result = serial.read()	
+					result = serial.read()
 					ret = {}
 					ret['result'] = result
 					ret['unit'] = "aguachuwe"
+					serial.close()
 					return {'data': marshal(ret, DataAPI.data_field)}
 
 	def put(self):
@@ -100,7 +101,9 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('W' + sensor['signal'] + pin)
+					serial.write('W' + sensor['signal'] + pin + 'X')
+					time.sleep(1)
+					serial.close()
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 

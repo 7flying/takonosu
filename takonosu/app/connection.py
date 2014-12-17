@@ -15,4 +15,5 @@ class Connection(object):
 		print result
 
 	def write(self, command):
+		print command
 		self.serial.write(command)

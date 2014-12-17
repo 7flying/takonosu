@@ -65,7 +65,7 @@ class DataAPI(Resource):
 					elif node['nic'] == 'Bluetooth':
 						port = BLUE_PORT
 						rate = BLUE_RATE
-					if serial_connections[BLUE_PORT] == None:
+					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 					serial_connections[BLUE_PORT].write('R' + sensor['signal'] + pin + 'X')
@@ -103,7 +103,7 @@ class DataAPI(Resource):
 					elif node['nic'] == 'Bluetooth':
 						port = BLUE_PORT
 						rate = BLUE_RATE
-					if serial_connections[BLUE_PORT] == None:
+					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 					serial_connections[BLUE_PORT].write('W' + sensor['signal'] + pin + args['data'] + 'X')

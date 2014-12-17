@@ -103,8 +103,8 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('W' + sensor['signal'] + pin + 'X')
-					time.sleep(1)
+					serial.write('W' + sensor['signal'] + pin + data + 'X')
+					time.sleep(	1)
 					serial.close()
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')

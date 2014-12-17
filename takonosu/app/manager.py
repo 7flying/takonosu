@@ -126,6 +126,10 @@ def get_node(node_id):
 		node[N_SENSORS] = []
 	return node
 
+def _get_node(node_id):
+	node = db.hgetall(KEY_NODES + str(node_id))
+	return node
+
 def get_nodes():
 	""" Returns every node and sensor in the db. """
 	ret = []

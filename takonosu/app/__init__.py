@@ -7,11 +7,14 @@ app.config.from_object('config')
 from app.routes import index
 
 from datetime import datetime
+import time
 from flask import Flask, abort, jsonify, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 import redis
 import manager
-from config import REDIS_HOST, REDIS_PORT, REDIS_DB
+from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_PORT, BLUE_RATE
+from connection import Connection
+
 # Restful api
 api = Api(app)
 
@@ -21,15 +24,15 @@ db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
 	data_field = {
-		'value' : fields.Float,
+		'value' : fields.String,
 		'unit': fields.String
 	}
-
+	
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
-		self.reqparse.add_argument('node', type=int, location='form')
-		self.reqparse.add_argument('sensor', type=int, location='form')
-		self.reqparse.add_argument('data', type=str, location='form')
+		self.reqparse.add_argument('node', type=int)
+		self.reqparse.add_argument('sensor', type=int)
+		self.reqparse.add_argument('data', type=str)
 		super(DataAPI, self).__init__()
 
 	def get(self):
@@ -39,11 +42,35 @@ class DataAPI(Resource):
 				sensor: the sensor to get data from
 		"""
 		args = self.reqparse.parse_args()
-		#ret = manager.get_value(args['node'], args['sensor'])
-		ret = {}
-		ret['value'] = 3.5
-		ret['unit'] = "C"
-		return {'data': marshal(ret, DataAPI.data_field)}
+		if args['node'] != None and args['sensor'] != None:
+			# From node select nic
+			node = manager._get_node(args['node'])
+			print node
+			if node == None:
+				abort(404)
+			else:
+				# From sensor get pin and signal
+				sensor = manager.get_sensor(args['sensor'])
+				print sensor
+				if sensor == None:
+					abort(404)
+				else:
+					port = BLUE_PORT
+					rate = BLUE_RATE
+					if node['nic'] == 'ZigBee':
+						print "en ZigBee"
+					elif node['nic'] == 'Bluetooth':
+						port = BLUE_PORT
+						rate = BLUE_RATE
+					serial = Connection(port, rate)
+					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
+					serial.write('R' + sensor['signal'] + pin)
+					time.sleep(1)
+					result = serial.read()	
+					ret = {}
+					ret['result'] = result
+					ret['unit'] = "aguachuwe"
+					return {'data': marshal(ret, DataAPI.data_field)}
 
 	def put(self):
 		"""
@@ -53,11 +80,29 @@ class DataAPI(Resource):
 				data: the data to be sent
 		"""
 		args = self.reqparse.parse_args()
-		response = 'Data sent.'
-		# response = someModule.send_data(args['node'], args['sensor'], args['data'])
-		return jsonify(message=response)
+		if args['node'] != None and args['sensor'] != None and args['data']:
+			# From node select nic
+			node = manager._get_node(args['node'])
+			if node == None:
+				abort(404)
+			else:
+				# From sensor get pin and signal
+				sensor = manager.get_sensor(args['sensor'])
+				if sensor == None:
+					abort(404)
+				else:
+					port = BLUE_PORT
+					rate = BLUE_RATE
+					if node['nic'] == 'ZigBee':
+						pass
+					elif node['nic'] == 'Bluetooth':
+						port = BLUE_PORT
+						rate = BLUE_RATE
+					serial = Connection(port, rate)
+					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
+					serial.write('W' + sensor['signal'] + pin)
 
-api.add_resource(DataAPI, '/takonosu/api/data',endpoint='data')
+api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 
 
 class SensorAPI(Resource):

@@ -103,7 +103,7 @@ class DataAPI(Resource):
 						rate = BLUE_RATE
 					serial = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					serial.write('W' + sensor['signal'] + pin + data + 'X')
+					serial.write('W' + sensor['signal'] + pin + args['data'] + 'X')
 					time.sleep(	1)
 					serial.close()
 

@@ -14,11 +14,11 @@ void setup(void) {
   pinMode(6, OUTPUT);
   pinMode(7, OUTPUT);
 
-  pinMode(8, INPUT);
-  pinMode(9, INPUT);
-  pinMode(10, INPUT);
-  pinMode(11, INPUT);
-  pinMode(12, INPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
 }
 

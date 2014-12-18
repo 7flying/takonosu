@@ -1,6 +1,11 @@
 angular.module('flagular')
   .controller('SensorCtrl', function ($scope, $stateParams, Node, SensorData) {
   
+  var signalSelection, directionSelection;
+  var board;
+  var tempSensors = [];
+  var requests = {};
+
   $scope.newSensor = false;
   $scope.sensors = [];
   $scope.newSensorSignal = 'None';
@@ -8,32 +13,18 @@ angular.module('flagular')
   $scope.signalList = ['Analog', 'Digital'];
   $scope.directionList = ['Read', 'Write'];
   $scope.pinList = [];
-  $scope.showPinList = false;
 
-  var signalSelection, directionSelection;
-  var board;
-  var tempSensors = [];
-  var requests = {};
 
   $scope.signalSelect = function(name) {
     $scope.newSensorSignal = name;
     if(name == $scope.signalList[0]) {
       signalSelection = 'A';
-      if(board == 'Arduino Uno') {
-        if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
-          $scope.newSensorPin = 'None';
-        }
-        loadPinList(5);
-        $scope.showPinList = true;
-      }
+      if(board == 'Arduino Uno')
+        loadPinListForArduinoSignal();
     } else {
       signalSelection = 'D';
-      if(board == 'Arduino Uno') {
-        if($scope.newSensorPin == 'None') {
-          $scope.newSensorPin = '';
-        }
-        $scope.showPinList = false;
-      }
+      if(board == 'Arduino Uno')
+        loadPinListForArduinoSignal();
     }
   }
 
@@ -41,8 +32,10 @@ angular.module('flagular')
     $scope.newSensorDirection = directionName;
     if(directionName == $scope.directionList[0]) {
       directionSelection = 'R';
+      loadPinListForArduinoDirection();
     } else {
       directionSelection = 'W';
+      loadPinListForArduinoDirection();
     }
   }
 
@@ -134,6 +127,12 @@ angular.module('flagular')
   Node.get({"id": $stateParams.id}).$promise.then(
     function success(data) {
     board = data.node.board_type;
+    if(board != 'Arduino Uno') { 
+      $scope.showPinList = false;
+    } else { 
+      $scope.showPinList = true;
+    }
+    loadPinListForArduinoSignal('');
     if(data.node.sensors.length == 0) {
         $scope.newSensor = true;
     } else {
@@ -162,6 +161,66 @@ angular.module('flagular')
     for(var i = 0; i < limit; i++) {
       $scope.pinList.push(i+1);
     }
+  }
+
+  function loadPinListArray(list) {
+    $scope.pinList = [];
+    for(var i in list){
+      $scope.pinList.push(list[i]);
+    }
+  }
+
+  function loadPinListForArduinoSignal() {
+    if($scope.newSensorSignal == $scope.signalList[0]) {
+      if($scope.newSensorDirection == 'None') {
+          loadPinListArray(['1', '2', '3', '4', '5', '6', '9', '10', '11']);
+      } else if($scope.newSensorDirection == $scope.directionList[0]) {
+        loadPinListArray(['1', '2', '3', '4', '5']);
+      } else {
+        loadPinListArray(['3', '5', '6', '9', '10', '11']);
+      }
+      if(typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '') {
+        $scope.newSensorPin = 'None';
+      } else if(!isPinInList($scope.newSensorSignal, $scope.pinList)) {
+        $scope.newSensorPin = $scope.pinList[0];
+      }
+    } else {
+      loadPinList(13);
+      if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
+        $scope.newSensorPin = 'None';
+      }
+    }
+  }
+
+  function loadPinListForArduinoDirection() {
+    if($scope.newSensorDirection == $scope.directionList[0]) {
+      if($scope.newSensorSignal == $scope.signalList[0]) {
+        loadPinListArray(['1', '2', '3', '4', '5']);
+      } else {
+        loadPinList(13);
+      }
+      if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
+        $scope.newSensorPin = 'None';
+      }
+    } else {
+      if($scope.newSensorSignal == $scope.signalList[0]) {
+        loadPinListArray(['3', '5', '6', '9', '10', '11']);
+      } else {
+        loadPinList(13);
+      }
+      if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
+        $scope.newSensorPin = 'None';
+      }
+    }
+  }
+
+  function isPinInList(pin, list) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i] == pin) {
+            return true;
+        }
+    }
+    return false;
   }
 
   function makeSensorUserfriendly(sensor) {

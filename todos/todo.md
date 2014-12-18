@@ -6,9 +6,8 @@ All:
 [x] - link all db to server
 [x] - list sensors
 [x] - list nodes
-[ ] - views to add
-[ ] - views to delete
-[ ] - views to modify
-		* [] - Save state
-[ ] - Enganchar los get data y send data a un proceso que haga algo
-[ ] - Entender los Waspmote
+[x] - views to add
+[x] - views to delete
+
+[x] - Enganchar los get data y send data a un proceso que haga algo
+

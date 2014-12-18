@@ -7,19 +7,8 @@ uint8_t buffInd = 0;
 
 void setup(void) {
   Serial.begin(RATE);
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-
-  pinMode(8, INPUT);
-  pinMode(9, INPUT);
-  pinMode(10, INPUT);
-  pinMode(11, INPUT);
-  pinMode(12, INPUT);
-  pinMode(13, OUTPUT);
+  for (uint8_t i = 2; i < 14; i++)
+    pinMode(i, OUTPUT);
 }
 
 // {R|W}{A|D}{NN}{X|valueX}

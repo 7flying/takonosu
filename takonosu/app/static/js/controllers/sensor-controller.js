@@ -86,30 +86,32 @@ angular.module('flagular')
       });
     }
   }
-
-  Node.getSensors({id: $stateParams.id}).$promise.then(
-    function success(data) {
-      if(data.sensors.length == 0) {
-        $scope.newSensor = true;
-      } else {
-        angular.forEach(data.sensors, function(sensor) {
-          sensor.edit = false;
-          $scope.sensors = data.sensors;
-          if(sensor.direction === 'R')
-          var request = setInterval(function() {
-            SensorData.getData({
-              "node": $stateParams.id,
-              "sensor": sensor.id
-            },function (data) {
-              sensor.in = data.data.value + ' ' + data.data.unit;
-              //console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
-            });
-          }, sensor.refresh);
-          if(sensor.direction == 'R')
-            requests[sensor.id] = request;
-        });
-      }
-    });
+  Node.get({"id": $stateParams.id}, function (nodeData) {
+    console.log(nodeData);
+    Node.getSensors({id: $stateParams.id}).$promise.then(
+      function success(data) {
+        if(data.sensors.length == 0) {
+          $scope.newSensor = true;
+        } else {
+          angular.forEach(data.sensors, function(sensor) {
+            sensor.edit = false;
+            $scope.sensors = data.sensors;
+            if(sensor.direction === 'R')
+            var request = setInterval(function() {
+              SensorData.getData({
+                "node": $stateParams.id,
+                "sensor": sensor.id
+              },function (data) {
+                sensor.in = data.data.value + ' ' + data.data.unit;
+                //console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
+              });
+            }, sensor.refresh);
+            if(sensor.direction == 'R')
+              requests[sensor.id] = request;
+          });
+        }
+      });
+  });
 
   $scope.$on('$destroy', function() {
     angular.forEach(requests, function(value, key) {

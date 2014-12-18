@@ -10,8 +10,10 @@ angular.module('flagular')
     $scope.newNodeBoard_type = name;
     if(name == 'Arduino Uno') {
       $scope.newNodeNic = 'Bluetooth'
+    } else if(name == 'Other') {
+      $scope.newNodeNic = 'Wifi'
     } else {
-      $scope.newNodeNic = 'ZigBee'
+      $scope.newNodeNic = 'XBee'
     }
   }
 
@@ -47,12 +49,14 @@ angular.module('flagular')
         Node.createNode({
           "name": $scope.newNodeName,
           "board_type": $scope.newNodeBoard_type,
-          "nic": $scope.newNodeNic
+          "nic": $scope.newNodeNic,
+          "ip": $scope.newNodeAddress
         }, function (data) {
           $scope.nodes.push(data.node);
           $scope.newNodeName = '';
           $scope.newNodeBoard_type = '';
           $scope.newNodeNic = '';
+          $scope.newNodeAddress = '';
         });
       } else
         $scope.newNode = true;
@@ -71,7 +75,8 @@ angular.module('flagular')
 
 	Node.query().$promise.then(
   	function success(data) {
-  		if(data.nodes.length == 0) {
+  		console.log(data);
+      if(data.nodes.length == 0) {
         $scope.newNode = true;
       } else {
         angular.forEach(data.nodes, function(node) {

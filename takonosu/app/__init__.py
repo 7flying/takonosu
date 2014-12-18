@@ -95,9 +95,7 @@ class DataAPI(Resource):
 						"""
 						return {'data': marshal(ret, DataAPI.data_field)}	
 					elif node['nic'] == 'Wifi':
-						
-					
-					
+						pass
 
 	def put(self):
 		"""

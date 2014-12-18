@@ -3,6 +3,9 @@ angular.module('flagular')
   $scope.newSensor = false;
   $scope.sensors = [];
   tempSensors = [];
+
+  var requests = {};
+
   $scope.editSensor = function(index) {
     if($scope.sensors[index].edit) {
         $scope.sensors[index].edit = false;
@@ -46,16 +49,16 @@ angular.module('flagular')
         "refresh": $scope.newSensorRefesh
       }, function (data) {
         if($scope.newSensorDirection == 'R') {
-          setInterval(function() {
+          var request = setInterval(function() {
             SensorData.getData({
               "node": $stateParams.id,
               "sensor": data.sensor.id
             },function (datainfo) {
-              console.log(datainfo);
               data.sensor.in = datainfo.data.value + ' ' + datainfo.data.unit;
               //console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
             });
           }, $scope.newSensorRefesh);
+          requests[data.sensor.id] = request;
         }
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
@@ -74,6 +77,8 @@ angular.module('flagular')
         "sensor_id": $scope.sensors[index].id,
         "id": $stateParams.id
       }, function() {
+        clearInterval(requests[$scope.sensors[index].id]);
+        delete requests[$scope.sensors[index].id];
         $scope.sensors.splice(index, 1);
         if($scope.sensors.length == 0) {
           $scope.newSensor = true;
@@ -91,19 +96,26 @@ angular.module('flagular')
           sensor.edit = false;
           $scope.sensors = data.sensors;
           if(sensor.direction === 'R')
-          setInterval(function() {
+          var request = setInterval(function() {
             SensorData.getData({
               "node": $stateParams.id,
               "sensor": sensor.id
             },function (data) {
-              console.log(data);
               sensor.in = data.data.value + ' ' + data.data.unit;
-              console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
+              //console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
             });
           }, sensor.refresh);
+          if(sensor.direction == 'R')
+            requests[sensor.id] = request;
         });
       }
     });
 
+  $scope.$on('$destroy', function() {
+    angular.forEach(requests, function(value, key) {
+      console.log(key);
+      clearInterval(value);
+    });
+  });
 
   });

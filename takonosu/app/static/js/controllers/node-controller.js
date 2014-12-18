@@ -54,7 +54,7 @@ angular.module('flagular')
         }, function (data) {
           $scope.nodes.push(data.node);
           $scope.newNodeName = '';
-          $scope.newNodeBoard_type = '';
+          $scope.newNodeBoard_type = 'None';
           $scope.newNodeNic = '';
           $scope.newNodeAddress = '';
         });

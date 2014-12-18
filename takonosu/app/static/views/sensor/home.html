@@ -21,12 +21,21 @@
                                         {{newSensorSignal}}<span class="caret"></span>
                                         </button>
                                             <ul class="dropdown-menu" role="menu">
-                                                <li ng-repeat="option in optionList"><a ng-click="signalSelect(option)" href="#">{{option}}</a></li>
+                                                <li ng-repeat="signal in signalList"><a ng-click="signalSelect(signal)" href="#">{{signal}}</a></li>
                                             </ul>
                                     </div>
                                 </td>
                                 <td><input required type="text" class="form-control" placeholder="Pin" type="number" ng-model="newSensorPin"></td>
-                                <td><input required type="text" class="form-control" placeholder="Direction" ng-model="newSensorDirection"></td>  
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        {{newSensorDirection}}<span class="caret"></span>
+                                        </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li ng-repeat="direction in directionList"><a ng-click="directionSelect(direction)" href="#">{{direction}}</a></li>
+                                            </ul>
+                                    </div>
+                                </td>  
                                 <td><input type="text" class="form-control" placeholder="Rate" ng-model="newSensorRefesh"></td>
                             </tr>
                         </table>
@@ -81,7 +90,7 @@
                         <button type="submit" class="btn btn-default btn" ng-click="updateSensor(sensor)">Submit</button>
                     </div>
                     <div ng-hide="sensor.edit">
-                        <div ng-if="sensor.direction == 'W'">
+                        <div ng-if="sensor.direction == directionList[1]">
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="input-group">
@@ -93,7 +102,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div ng-if="sensor.direction == 'R'">
+                        <div ng-if="sensor.direction == directionList[0]">
                             <span>
                                 <span><b>Latest value: </b></span>
                                 <span>{{sensor.in}}</span>

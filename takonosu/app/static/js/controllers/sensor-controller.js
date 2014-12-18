@@ -4,18 +4,29 @@ angular.module('flagular')
   $scope.newSensor = false;
   $scope.sensors = [];
   $scope.newSensorSignal = 'None';
-  $scope.optionList = ['Analog', 'Digital'];
-  var signalSelection;
+  $scope.newSensorDirection = 'None';
+  $scope.signalList = ['Analog', 'Digital'];
+  $scope.directionList = ['Read', 'Write'];
+  var signalSelection, directionSelection;
 
   var tempSensors = [];
   var requests = {};
 
   $scope.signalSelect = function(name) {
     $scope.newSensorSignal = name;
-    if(name == 'Analog') {
+    if(name == $scope.signalList[0]) {
       signalSelection = 'A';
     } else {
       signalSelection = 'D';
+    }
+  }
+
+  $scope.directionSelect = function(directionName) {
+    $scope.newSensorDirection = directionName;
+    if(directionName == $scope.directionList[0]) {
+      directionList = 'R';
+    } else {
+      directionList = 'W';
     }
   }
 
@@ -58,10 +69,10 @@ angular.module('flagular')
         "name": $scope.newSensorName,
         "signal": signalSelection,
         "pin": $scope.newSensorPin,
-        "direction": $scope.newSensorDirection,
+        "direction": directionList,
         "refresh": $scope.newSensorRefesh
       }, function (data) {
-        if($scope.newSensorDirection == 'R') {
+        if($scope.newSensorDirection == directionList[0]) {
           var request = setInterval(function() {
             SensorData.getData({
               "node": $stateParams.id,
@@ -73,11 +84,12 @@ angular.module('flagular')
           }, $scope.newSensorRefesh);
           requests[data.sensor.id] = request;
         }
+        makeSensorUserfriendly(data.sensor);
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
-        $scope.newSensorSignal = '';
+        $scope.newSensorSignal = 'None';
         $scope.newSensorPin = '';
-        $scope.newSensorDirection = '';
+        $scope.newSensorDirection = 'None';
         $scope.newSensorRefesh = '';
       });
     } else
@@ -104,14 +116,10 @@ angular.module('flagular')
         $scope.newSensor = true;
     } else {
       angular.forEach(data.node.sensors, function(sensor) {
-        if(sensor.signal == 'A') {
-          sensor.signal = 'Analog'; 
-        } else {
-          sensor.signal = 'Digital';
-        }
+        makeSensorUserfriendly(sensor);
         sensor.edit = false;
         $scope.sensors = data.node.sensors;
-        if(sensor.direction === 'R')
+        if(sensor.direction == $scope.directionList[0])
         var request = setInterval(function() {
           SensorData.getData({
             "node": $stateParams.id,
@@ -121,11 +129,24 @@ angular.module('flagular')
             //console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
           });
         }, sensor.refresh);
-        if(sensor.direction == 'R')
+        if(sensor.direction == $scope.directionList[0])
           requests[sensor.id] = request;
       });
     }
   });
+
+  function makeSensorUserfriendly(sensor) {
+    if(sensor.signal == 'A') {
+      sensor.signal = $scope.signalList[0]; 
+    } else {
+      sensor.signal = $scope.signalList[1];
+    }
+    if(sensor.direction == 'R') {
+      sensor.direction = $scope.directionList[0];
+    } else {
+      sensor.direction = $scope.directionList[1];
+    }
+  }
 
   $scope.$on('$destroy', function() {
     angular.forEach(requests, function(value, key) {

@@ -15,7 +15,16 @@
                                 <th>Rate</th>
                             </tr>
                             <tr>
-                                <td><input required type="text" class="form-control" placeholder="Signal" ng-model="newSensorSignal"></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        {{newSensorSignal}}<span class="caret"></span>
+                                        </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li ng-repeat="option in optionList"><a ng-click="signalSelect(option)" href="#">{{option}}</a></li>
+                                            </ul>
+                                    </div>
+                                </td>
                                 <td><input required type="text" class="form-control" placeholder="Pin" type="number" ng-model="newSensorPin"></td>
                                 <td><input required type="text" class="form-control" placeholder="Direction" ng-model="newSensorDirection"></td>  
                                 <td><input type="text" class="form-control" placeholder="Rate" ng-model="newSensorRefesh"></td>

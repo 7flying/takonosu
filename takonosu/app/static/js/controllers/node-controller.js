@@ -75,7 +75,6 @@ angular.module('flagular')
 
 	Node.query().$promise.then(
   	function success(data) {
-  		console.log(data);
       if(data.nodes.length == 0) {
         $scope.newNode = true;
       } else {

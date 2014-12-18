@@ -24,9 +24,9 @@ angular.module('flagular')
   $scope.directionSelect = function(directionName) {
     $scope.newSensorDirection = directionName;
     if(directionName == $scope.directionList[0]) {
-      directionList = 'R';
+      directionSelection = 'R';
     } else {
-      directionList = 'W';
+      directionSelection = 'W';
     }
   }
 
@@ -69,10 +69,12 @@ angular.module('flagular')
         "name": $scope.newSensorName,
         "signal": signalSelection,
         "pin": $scope.newSensorPin,
-        "direction": directionList,
+        "direction": directionSelection,
         "refresh": $scope.newSensorRefesh
       }, function (data) {
-        if($scope.newSensorDirection == directionList[0]) {
+        makeSensorUserfriendly(data.sensor);
+        console.log($scope.newSensorDirection);
+        if($scope.newSensorDirection == $scope.directionList[0]) {
           var request = setInterval(function() {
             SensorData.getData({
               "node": $stateParams.id,
@@ -84,7 +86,6 @@ angular.module('flagular')
           }, $scope.newSensorRefesh);
           requests[data.sensor.id] = request;
         }
-        makeSensorUserfriendly(data.sensor);
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = 'None';

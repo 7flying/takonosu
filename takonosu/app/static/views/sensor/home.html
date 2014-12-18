@@ -85,7 +85,11 @@
                             </div>
                         </div>
                         <div ng-if="sensor.direction == 'R'">
-                            <span><span>Latest value: {{sensor.in}}</span><span class="label label-default" ng-model="sensor.in"></span></span>
+                            <span>
+                                <span><b>Latest value: </b></span>
+                                <span>{{sensor.in}}</span>
+                                <span class="label label-default" ng-model="sensor.in"></span>
+                            </span>
                         </div>
                     </div>
                 </div>

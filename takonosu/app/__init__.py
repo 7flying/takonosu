@@ -14,6 +14,7 @@ from flask import Flask, abort, jsonify, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 import redis
 import manager
+import Queue
 from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_PORT, BLUE_RATE
 from connection import Connection
 
@@ -25,17 +26,22 @@ db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 # Serial port management
 serial_connections = {}
+serial_connections[BLUE_PORT] = Connection(BLUE_PORT, BLUE_RATE)
 pool = ThreadPool(processes=3)
 
 
-def serial_read(command, serial_con, queue):
+def serial_read(command, serial_con, queue=""):
+	print "Serial read"
 	serial_con.write(command)
+	print "resultado imprimido"
 	result = serial_con.read()
-	queue.put(result)
+	#queue.put(result)
+	return result
 	
-
 def serial_write(command, serial_con):
+	print "Serial write"
 	serial_con.write(command)
+
 
 class DataAPI(Resource):
 	""" Class to get/send data from/to a sensor. """
@@ -82,20 +88,20 @@ class DataAPI(Resource):
 					if serial_connections.get(BLUE_PORT, None) == None:
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					command = 'R' + sensor['signal'] + pin + 'X' + '\n'
+					command = 'R' + sensor['signal'] + pin + 'X'
 					ret = {}
-					ret['unit'] = "aguachuwe"
+					ret['unit'] = " "
 					# Option 1
-					"""
 					async_result = pool.apply_async(serial_read, (command, serial_connections[BLUE_PORT]))
-					ret['result'] = async_result
-					"""
+					ret['value'] = async_result.get(timeout=1)
 					# Option 2
-					queue = Queue()
+					"""
+					queue = Queue.Queue()
 					t = Thread(target=serial_read, args=(command, serial_connections[BLUE_PORT], queue))
 					t.start()
 					result = queue.get()
-					ret['result'] = result
+					ret['value'] = result
+					"""
 					return {'data': marshal(ret, DataAPI.data_field)}
 
 	def put(self):

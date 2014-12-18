@@ -49,10 +49,11 @@ angular.module('flagular')
           setInterval(function() {
             SensorData.getData({
               "node": $stateParams.id,
-              "sensor": sensor.id
+              "sensor": data.sensor.id
             },function (datainfo) {
+              console.log(datainfo);
               data.sensor.in = datainfo.data.value + ' ' + datainfo.data.unit;
-              console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
+              //console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
             });
           }, $scope.newSensorRefesh);
         }
@@ -95,6 +96,7 @@ angular.module('flagular')
               "node": $stateParams.id,
               "sensor": sensor.id
             },function (data) {
+              console.log(data);
               sensor.in = data.data.value + ' ' + data.data.unit;
               console.log(sensor.name + ' info: ' + data.data.value + ' ' + data.data.unit);
             });
@@ -102,4 +104,6 @@ angular.module('flagular')
         });
       }
     });
+
+
   });

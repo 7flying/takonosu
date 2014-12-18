@@ -50,39 +50,36 @@ def _init_gpio(gpio, direction):
 	ret = True
 	if not os.path.isdir('/sys/class/gpio/gpio' + str(gpio)):
 		try:
-			f = open('/sys/class/gpio/export')
+			f = open('/sys/class/gpio/export', 'w')
 			f.write(str(gpio))
 			f.close()
-			f = open('/sys/class/gpio/gpio' + str(gpio) + '/direction')
+			f = open('/sys/class/gpio/gpio' + str(gpio) + '/direction', 'w')
 			f.write(str(direction))
 			f.close()
-		except IOError:
+		except IOError, error:
+			print IOError, error
 			ret = False
 	return ret
 
 def read_gpio(gpio):
-	"""
-	ok = _init_gpio(gpio, 'input')
+	ok = _init_gpio(gpio, 'in')
 	if ok:
-		gpio = open('/sys/class/gpio/gpio' + str(gpio) + '/value')
+		gpio = open('/sys/class/gpio/gpio' + str(gpio) + '/value', 'r')
 		value = gpio.read()
 		return value
 	else:
 		return 'Error reading'
-	"""
-	return '23'
+	#return '23'
 
 def write_gpio(gpio, value):
-	"""
-	ok = _init_gpio(gpio, 'output')
+	ok = _init_gpio(gpio, 'out')
 	if ok:
-		gpio = open('/sys/class/gpio/gpio' + str(gpio) + '/value')
+		gpio = open('/sys/class/gpio/gpio' + str(gpio) + '/value', 'w')
 		gpio.write(str(value))
 		return 'Ok'
 	else:
 		return 'Error writing'
-	"""
-	return 'Ok'
+	#return 'Ok'
 
 if __name__ == '__main__':
 	run_server()

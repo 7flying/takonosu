@@ -292,7 +292,7 @@ class NodeSensorsAPI(Resource):
 		self.reqparse.add_argument('signal', type=str)
 		self.reqparse.add_argument('pin', type=int)
 		self.reqparse.add_argument('direction', type=str)
-		self.reqparse.add_argument('refresh', type=int)
+		self.reqparse.add_argument('refresh', type=str)
 		super(NodeSensorsAPI, self).__init__()
 
 	def get(self):

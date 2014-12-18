@@ -7,8 +7,11 @@ angular.module('flagular')
   $scope.newSensorDirection = 'None';
   $scope.signalList = ['Analog', 'Digital'];
   $scope.directionList = ['Read', 'Write'];
-  var signalSelection, directionSelection;
+  $scope.pinList = [];
+  $scope.showPinList = false;
 
+  var signalSelection, directionSelection;
+  var board;
   var tempSensors = [];
   var requests = {};
 
@@ -16,8 +19,21 @@ angular.module('flagular')
     $scope.newSensorSignal = name;
     if(name == $scope.signalList[0]) {
       signalSelection = 'A';
+      if(board == 'Arduino Uno') {
+        if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
+          $scope.newSensorPin = 'None';
+        }
+        loadPinList(5);
+        $scope.showPinList = true;
+      }
     } else {
       signalSelection = 'D';
+      if(board == 'Arduino Uno') {
+        if($scope.newSensorPin == 'None') {
+          $scope.newSensorPin = '';
+        }
+        $scope.showPinList = false;
+      }
     }
   }
 
@@ -28,6 +44,10 @@ angular.module('flagular')
     } else {
       directionSelection = 'W';
     }
+  }
+
+  $scope.pinSelect = function(pin) {
+    $scope.newSensorPin = pin;
   }
 
   $scope.editSensor = function(index) {
@@ -73,7 +93,6 @@ angular.module('flagular')
         "refresh": $scope.newSensorRefesh
       }, function (data) {
         makeSensorUserfriendly(data.sensor);
-        console.log($scope.newSensorDirection);
         if($scope.newSensorDirection == $scope.directionList[0]) {
           var request = setInterval(function() {
             SensorData.getData({
@@ -112,7 +131,9 @@ angular.module('flagular')
       });
     }
   }
-  Node.get({"id": $stateParams.id}, function (data) {
+  Node.get({"id": $stateParams.id}).$promise.then(
+    function success(data) {
+    board = data.node.board_type;
     if(data.node.sensors.length == 0) {
         $scope.newSensor = true;
     } else {
@@ -135,6 +156,13 @@ angular.module('flagular')
       });
     }
   });
+
+  function loadPinList(limit) {
+    $scope.pinList = [];
+    for(var i = 0; i < limit; i++) {
+      $scope.pinList.push(i+1);
+    }
+  }
 
   function makeSensorUserfriendly(sensor) {
     if(sensor.signal == 'A') {

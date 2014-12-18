@@ -120,6 +120,7 @@ def insert_node(node):
 	db.hset(KEY_NODES + id, N_NIC, node[N_NIC])
 	db.hset(KEY_NODES + id, N_SENSORS, id)
 	if node.get(N_IP, None) != None:
+		print "ip no none"
 		db.hset(KEY_NODES + id, N_IP, node[N_IP])
 	if node.get(N_SENSORS) != None:
 		for sensor in node[N_SENSORS]:

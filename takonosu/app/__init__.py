@@ -66,8 +66,6 @@ class DataAPI(Resource):
 				if sensor == None:
 					abort(404)
 				else:
-					port = BLUE_PORT
-					rate = BLUE_RATE
 					if node['nic'] == 'ZigBee':
 						print "en ZigBee"
 					elif node['nic'] == 'Bluetooth':
@@ -95,7 +93,11 @@ class DataAPI(Resource):
 						"""
 						return {'data': marshal(ret, DataAPI.data_field)}	
 					elif node['nic'] == 'Wifi':
-						pass
+						ip = node['ip']
+						data = {}
+						data['value'] = nic.gpio_read(sensor['pin'], ip)
+						data['unit'] = " "
+						return {'data': marshal(data, DataAPI.data_field)}
 
 	def put(self):
 		"""
@@ -233,7 +235,10 @@ class NodesAPI(Resource):
 		node['sensors'] = []
 		result = manager.insert_node(node)
 		created = manager.get_node(result)
-		return {'node' : marshal(created, NodesAPI.node_field)}
+		if created.get('ip', None) != None:
+			return {'node' : marshal(created, NodesAPI.node_field_ip)}	
+		else:
+			return {'node' : marshal(created, NodesAPI.node_field)}
 
 	def put(self):
 		""" Edit a Node."""

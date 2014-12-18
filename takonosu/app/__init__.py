@@ -126,15 +126,22 @@ class DataAPI(Resource):
 					if node['nic'] == 'ZigBee':
 						pass
 					elif node['nic'] == 'Bluetooth':
-						port = BLUE_PORT
-						rate = BLUE_RATE
-					if serial_connections.get(BLUE_PORT, None) == None:
-						serial_connections[BLUE_PORT] = Connection(port, rate)
-					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
-					thread = Thread(target=nic.serial_write,
-						args=(command, serial_connections[BLUE_PORT]))
-					thread.start()
+						if serial_connections.get(BLUE_PORT, None) == None:
+							serial_connections[BLUE_PORT] = Connection(
+								BLUE_PORT, BLUE_RATE)
+						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
+						command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
+						thread = Thread(target=nic.serial_write,
+							args=(command, serial_connections[BLUE_PORT]))
+						thread.start()
+					elif node['nic'] == 'Wifi':
+						ip = node['ip']
+						pin = sensor['pin']
+						data = args['data']
+						thread = Thread(target=nic.gpio_write,
+							args=(pin, ip, data))
+						thread.start()
+
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 

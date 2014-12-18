@@ -18,6 +18,7 @@ N_NAME 		= 'name'
 N_BOARD 	= 'board_type'
 N_NIC 		= 'nic' # Bluetooth, wifi
 N_SENSORS 	= 'sensors'
+N_IP		= 'ip'
 
 S_ID 		= 'id'
 S_NAME		= 'name'
@@ -118,6 +119,8 @@ def insert_node(node):
 	db.hset(KEY_NODES + id, N_BOARD, node[N_BOARD])
 	db.hset(KEY_NODES + id, N_NIC, node[N_NIC])
 	db.hset(KEY_NODES + id, N_SENSORS, id)
+	if node.get(N_IP, None) != None:
+		db.hset(KEY_NODES + id, N_IP, node[N_IP])
 	if node.get(N_SENSORS) != None:
 		for sensor in node[N_SENSORS]:
 			insert_sensor_to_node(id, sensor)
@@ -139,6 +142,8 @@ def modify_node(new_node):
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_NAME, new_node[N_NAME])
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_BOARD, new_node[N_BOARD])
 	db.hset(KEY_NODES + str(new_node[N_ID]), N_NIC, new_node[N_NIC])
+	if new_node.get(N_IP, None) != None:
+		db.hset(KEY_NODES + str(new_node[N_ID]), N_IP, new_node[N_IP])
 	return True
 
 def get_node(node_id):

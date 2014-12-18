@@ -14,6 +14,7 @@ from flask import Flask, abort, jsonify, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 import redis
 import manager
+import nic
 import Queue
 from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_PORT, BLUE_RATE
 from connection import Connection
@@ -24,23 +25,10 @@ api = Api(app)
 # Redis database
 db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+pool = ThreadPool(processes=3)
 # Serial port management
 serial_connections = {}
 serial_connections[BLUE_PORT] = Connection(BLUE_PORT, BLUE_RATE)
-pool = ThreadPool(processes=3)
-
-
-def serial_read(command, serial_con, queue=""):
-	print "Serial read"
-	serial_con.write(command)
-	print "resultado imprimido"
-	result = serial_con.read()
-	#queue.put(result)
-	return result
-	
-def serial_write(command, serial_con):
-	print "Serial write"
-	serial_con.write(command)
 
 
 class DataAPI(Resource):
@@ -83,26 +71,33 @@ class DataAPI(Resource):
 					if node['nic'] == 'ZigBee':
 						print "en ZigBee"
 					elif node['nic'] == 'Bluetooth':
-						port = BLUE_PORT
-						rate = BLUE_RATE
-					if serial_connections.get(BLUE_PORT, None) == None:
-						serial_connections[BLUE_PORT] = Connection(port, rate)
-					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
-					command = 'R' + sensor['signal'] + pin + 'X'
-					ret = {}
-					ret['unit'] = " "
-					# Option 1
-					async_result = pool.apply_async(serial_read, (command, serial_connections[BLUE_PORT]))
-					ret['value'] = async_result.get(timeout=1)
-					# Option 2
-					"""
-					queue = Queue.Queue()
-					t = Thread(target=serial_read, args=(command, serial_connections[BLUE_PORT], queue))
-					t.start()
-					result = queue.get()
-					ret['value'] = result
-					"""
-					return {'data': marshal(ret, DataAPI.data_field)}
+						if serial_connections.get(BLUE_PORT, None) == None:
+							serial_connections[BLUE_PORT] = Connection(
+								BLUE_PORT, BLUE_RATE)
+						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
+						command = 'R' + sensor['signal'] + pin + 'X'
+						ret = {}
+						ret['unit'] = " "
+						# Option 1
+						async_result = pool.apply_async(
+							nic.serial_read,
+							(command, serial_connections[BLUE_PORT]))
+						ret['value'] = async_result.get(timeout=1)
+						# Option 2
+						"""
+						queue = Queue.Queue()
+						t = Thread(target=serial_read,
+							args=(command,
+								serial_connections[BLUE_PORT], queue))
+						t.start()
+						result = queue.get()
+						ret['value'] = result
+						"""
+						return {'data': marshal(ret, DataAPI.data_field)}	
+					elif node['nic'] == 'Wifi':
+						
+					
+					
 
 	def put(self):
 		"""
@@ -135,7 +130,8 @@ class DataAPI(Resource):
 						serial_connections[BLUE_PORT] = Connection(port, rate)
 					pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 					command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
-					thread = Thread(target=serial_write, args=(command, serial_connections[BLUE_PORT]))
+					thread = Thread(target=nic.serial_write,
+						args=(command, serial_connections[BLUE_PORT]))
 					thread.start()
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
@@ -195,12 +191,22 @@ class NodesAPI(Resource):
 		'sensors' : fields.List(fields.Nested(SensorAPI.sensor_field)) 
 	}
 
+	node_field_ip = {
+		'id': fields.Integer,
+		'name':fields.String,
+		'board_type': fields.String,
+		'nic': fields.String,
+		'ip': fields.String,
+		'sensors' : fields.List(fields.Nested(SensorAPI.sensor_field)) 
+	}
+
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
 		self.reqparse.add_argument('id', type=int)
 		self.reqparse.add_argument('name', type=str)
 		self.reqparse.add_argument('board_type', type=str)
 		self.reqparse.add_argument('nic', type=str)
+		self.reqparse.add_argument('ip', type=str)
 		super(NodesAPI, self).__init__()
 
 	def get(self):
@@ -211,7 +217,10 @@ class NodesAPI(Resource):
 			return jsonify(nodes=nodes)
 		elif args['id'] != None:
 			node = manager.get_node(args['id'])
-			return {'node' : marshal(node, NodesAPI.node_field)}
+			if node.get('ip', None) != None:
+				return {'node' : marshal(node, NodesAPI.node_field_ip)} 
+			else:
+				return {'node' : marshal(node, NodesAPI.node_field)}
 		else:
 			abort(400)	
 	def post(self):
@@ -221,6 +230,8 @@ class NodesAPI(Resource):
 		node['name'] = args['name']
 		node['board_type'] = args['board_type']
 		node['nic'] = args['nic']
+		if args.get('ip', None) != None:
+			node['ip'] = args['ip']
 		node['sensors'] = []
 		result = manager.insert_node(node)
 		created = manager.get_node(result)
@@ -235,6 +246,8 @@ class NodesAPI(Resource):
 			node['name'] = args['name']
 			node['board_type'] = args['board_type']
 			node['nic'] = args['nic']
+			if args.get('ip', None) != None:
+				node['ip'] = args['ip']
 			result = manager.modify_node(node)
 			if result:
 				return jsonify(message="Node modified", code=201)

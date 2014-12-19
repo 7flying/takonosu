@@ -5,6 +5,7 @@ angular.module('flagular')
   $scope.newNode = false;
   $scope.newNodeBoard_type = 'None';
   $scope.newNodeNic = 'None';
+  $scope.showError = false;
 
   $scope.boardSelect = function(name) {
     $scope.newNodeBoard_type = name;
@@ -45,19 +46,27 @@ angular.module('flagular')
 
     $scope.createNode = function() {
       if($scope.newNode) {
-        $scope.newNode = false;
-        Node.createNode({
-          "name": $scope.newNodeName,
-          "board_type": $scope.newNodeBoard_type,
-          "nic": $scope.newNodeNic,
-          "address": $scope.newNodeAddress
-        }, function (data) {
-          $scope.nodes.push(data.node);
-          $scope.newNodeName = '';
-          $scope.newNodeBoard_type = 'None';
-          $scope.newNodeNic = '';
-          $scope.newNodeAddress = '';
-        });
+        if(typeof $scope.newNodeName !== 'undefined' && $scope.newNodeName.length
+          && typeof $scope.newNodeAddress !== 'undefined' && $scope.newNodeAddress.length
+          && $scope.newNodeBoard_type != 'None')
+        {
+          Node.createNode({
+            "name": $scope.newNodeName,
+            "board_type": $scope.newNodeBoard_type,
+            "nic": $scope.newNodeNic,
+            "address": $scope.newNodeAddress
+          }, function (data) {
+            $scope.nodes.push(data.node);
+            $scope.newNodeName = '';
+            $scope.newNodeBoard_type = 'None';
+            $scope.newNodeNic = '';
+            $scope.newNodeAddress = '';
+            $scope.newNode = false;
+            $scope.showError = false;
+          });
+        } else {
+          $scope.showError = true;
+        }
       } else
         $scope.newNode = true;
     }

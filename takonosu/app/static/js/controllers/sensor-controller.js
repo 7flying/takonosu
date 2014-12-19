@@ -14,6 +14,7 @@ angular.module('flagular')
   $scope.signalList = ['Analog', 'Digital'];
   $scope.directionList = ['Read', 'Write'];
   $scope.pinList = [];
+  $scope.showError = false;
 
 
   $scope.signalSelect = function(name) {
@@ -82,42 +83,72 @@ angular.module('flagular')
     }
   }
 
+  function checkReadOk() {
+    return (typeof $scope.newSensorRefesh !== 'undefined'
+          && !isNaN($scope.newSensorRefesh));
+  }
+
+  function checkBasicData() {
+    return (typeof $scope.newSensorName !== 'undefined' && $scope.newSensorName.length
+          && $scope.newSensorSignal != 'None'
+          && $scope.newSensorDirection != 'None'
+          && !isNaN($scope.newSensorPin));
+  }
+
+  function sendSensor() {
+    Node.createSensor({
+      "id": $stateParams.id,
+      "name": $scope.newSensorName,
+      "signal": signalSelection,
+      "pin": $scope.newSensorPin,
+      "direction": directionSelection,
+      "refresh": $scope.newSensorRefesh
+    }, function (data) {
+      makeSensorUserfriendly(data.sensor);
+      $scope.newSensor = false;
+      $scope.showError = false;
+      if($scope.newSensorDirection == $scope.directionList[0]) {
+        var request = setInterval(function() {
+          SensorData.getData({
+            "node": $stateParams.id,
+            "sensor": data.sensor.id
+          },function (datainfo) {
+            data.sensor.in = datainfo.data.value + ' ' + datainfo.data.unit;
+            //console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
+          });
+        }, $scope.newSensorRefesh);
+        requests[data.sensor.id] = request;
+      }
+      usedPins.push(data.sensor.pin);
+      $scope.sensors.push(data.sensor);
+      $scope.newSensorName = '';
+      $scope.newSensorSignal = 'None';
+      $scope.newSensorDirection = 'None';
+      $scope.newSensorRefesh = '';
+      if(board == 'Arduino Uno') {
+        $scope.newSensorPin = 'None';
+        loadPinListForArduinoSignal('');
+      } else {
+        $scope.newSensorPin = '';
+      }
+    });
+  }
+
   $scope.createSensor = function() {
     if($scope.newSensor) {
-      $scope.newSensor = false;
-      Node.createSensor({
-        "id": $stateParams.id,
-        "name": $scope.newSensorName,
-        "signal": signalSelection,
-        "pin": $scope.newSensorPin,
-        "direction": directionSelection,
-        "refresh": $scope.newSensorRefesh
-      }, function (data) {
-        makeSensorUserfriendly(data.sensor);
-        if($scope.newSensorDirection == $scope.directionList[0]) {
-          var request = setInterval(function() {
-            SensorData.getData({
-              "node": $stateParams.id,
-              "sensor": data.sensor.id
-            },function (datainfo) {
-              data.sensor.in = datainfo.data.value + ' ' + datainfo.data.unit;
-              //console.log(sensor.name + ' info: ' + datainfo.data.value + ' ' + datainfo.data.unit);
-            });
-          }, $scope.newSensorRefesh);
-          requests[data.sensor.id] = request;
+      if(checkBasicData()) {
+        if($scope.newSensorDirection ==  $scope.directionList[0]) {
+          if(checkReadOk()) {
+            sendSensor();
+          } else {
+            $scope.showError = true;
+          }
+        } else {
+          sendSensor();
         }
-        usedPins.push(data.sensor.pin);
-        $scope.sensors.push(data.sensor);
-        $scope.newSensorName = '';
-        $scope.newSensorSignal = 'None';
-        $scope.newSensorDirection = 'None';
-        $scope.newSensorRefesh = '';
-        if(board == 'Arduino Uno') {
-          $scope.newSensorPin = 'None';
-          loadPinListForArduinoSignal('');
-        } else
-          $scope.newSensorPin = '';
-      });
+      } else {
+        $scope.showError = true;
+      }
     } else
       $scope.newSensor = true;
   }
@@ -130,6 +161,7 @@ angular.module('flagular')
       }, function() {
         clearInterval(requests[$scope.sensors[index].id]);
         delete requests[$scope.sensors[index].id];
+        freePin($scope.sensors[index].pin);
         $scope.sensors.splice(index, 1);
         if($scope.sensors.length == 0) {
           $scope.newSensor = true;
@@ -198,7 +230,7 @@ angular.module('flagular')
       }
       if(typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '') {
         $scope.newSensorPin = 'None';
-      } else if(!isPinInList($scope.newSensorSignal, $scope.pinList)) {
+      } else if(!isPinInList($scope.newSensorPin, $scope.pinList)) {
         $scope.newSensorPin = $scope.pinList[0];
       }
     } else {
@@ -218,6 +250,8 @@ angular.module('flagular')
       }
       if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
         $scope.newSensorPin = 'None';
+      } else if(!isPinInList($scope.newSensorPin, $scope.pinList)) {
+        $scope.newSensorPin = $scope.pinList[0];
       }
     } else {
       if($scope.newSensorSignal == $scope.signalList[0]) {
@@ -227,6 +261,8 @@ angular.module('flagular')
       }
       if((typeof $scope.newSensorPin === 'undefined' || $scope.newSensorPin == '')) {
         $scope.newSensorPin = 'None';
+      } else if(!isPinInList($scope.newSensorPin, $scope.pinList)) {
+        $scope.newSensorPin = $scope.pinList[0];
       }
     }
   }
@@ -250,6 +286,15 @@ angular.module('flagular')
       sensor.direction = $scope.directionList[0];
     } else {
       sensor.direction = $scope.directionList[1];
+    }
+  }
+
+  function freePin(pin) {
+    for(var i = 0; i < usedPins.length; i++) {
+      if(usedPins[i] == pin) {
+        usedPins.splice(i, 1);
+        loadPinListForArduinoSignal('');
+      }
     }
   }
 

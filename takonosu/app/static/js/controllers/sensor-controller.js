@@ -5,6 +5,7 @@ angular.module('flagular')
   var board;
   var tempSensors = [];
   var requests = {};
+  var usedPins = [];
 
   $scope.newSensor = false;
   $scope.sensors = [];
@@ -101,7 +102,7 @@ angular.module('flagular')
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = 'None';
-        $scope.newSensorPin = '';
+        $scope.newSensorPin = 'None';
         $scope.newSensorDirection = 'None';
         $scope.newSensorRefesh = '';
       });
@@ -132,11 +133,12 @@ angular.module('flagular')
     } else { 
       $scope.showPinList = true;
     }
-    loadPinListForArduinoSignal('');
     if(data.node.sensors.length == 0) {
         $scope.newSensor = true;
     } else {
       angular.forEach(data.node.sensors, function(sensor) {
+        console.log(sensor.pin);
+        usedPins.push(sensor.pin);
         makeSensorUserfriendly(sensor);
         sensor.edit = false;
         $scope.sensors = data.node.sensors;
@@ -154,19 +156,22 @@ angular.module('flagular')
           requests[sensor.id] = request;
       });
     }
+    loadPinListForArduinoSignal('');
   });
 
   function loadPinList(limit) {
     $scope.pinList = [];
     for(var i = 0; i < limit; i++) {
-      $scope.pinList.push(i+1);
+      if(!isPinInList(i+1, usedPins))
+        $scope.pinList.push(i+1);
     }
   }
 
   function loadPinListArray(list) {
     $scope.pinList = [];
     for(var i in list){
-      $scope.pinList.push(list[i]);
+      if(!isPinInList(list[i], usedPins))
+        $scope.pinList.push(list[i]);
     }
   }
 

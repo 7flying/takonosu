@@ -50,7 +50,7 @@ angular.module('flagular')
           "name": $scope.newNodeName,
           "board_type": $scope.newNodeBoard_type,
           "nic": $scope.newNodeNic,
-          "ip": $scope.newNodeAddress
+          "address": $scope.newNodeAddress
         }, function (data) {
           $scope.nodes.push(data.node);
           $scope.newNodeName = '';

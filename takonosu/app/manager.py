@@ -63,6 +63,7 @@ def populate():
 	node[N_NAME] = "Testing Node "
 	node[N_BOARD] = 'Arduino Uno'
 	node[N_NIC] = 'Bluetooth'
+	node[N_ADDR] = '/dev/ttyACM0'
 	sensors = []
 	sensor = {}
 	sensor[S_NAME] = 'TESTING SENSOR'

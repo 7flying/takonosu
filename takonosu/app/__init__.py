@@ -72,7 +72,9 @@ class DataAPI(Resource):
 					abort(404)
 				else:
 					if node['nic'] == BLUETOOTH:
+						global serial_connection
 						if serial_connection == None:
+							global serial_connection
 							serial_connection = Connection(node['address'],
 								BLUE_RATE)
 						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
@@ -80,6 +82,7 @@ class DataAPI(Resource):
 						ret = {}
 						ret['unit'] = " "
 						# Option 1
+						global serial_connection
 						async_result = pool.apply_async(
 							nic.serial_read,
 							(command, serial_connection))
@@ -125,11 +128,16 @@ class DataAPI(Resource):
 					abort(404)
 				else:
 					if node['nic'] == BLUETOOTH:
+						global serial_connection
+						temp = serial_connection
+						global serial_connection
 						if serial_connection == None:
+							global serial_connection
 							serial_connection = Connection(
 								node['address'], BLUE_RATE)
 						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 						command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
+						global serial_connection
 						thread = Thread(target=nic.serial_write,
 							args=(command, serial_connection))
 						thread.start()
@@ -214,6 +222,7 @@ class NodesAPI(Resource):
 		self.reqparse.add_argument('board_type', type=str)
 		self.reqparse.add_argument('nic', type=str)
 		self.reqparse.add_argument('address', type=str)
+		
 		super(NodesAPI, self).__init__()
 
 	def get(self):
@@ -228,9 +237,13 @@ class NodesAPI(Resource):
 			if node['nic'] == BLUETOOTH:
 				# Unpair the last one
 				global serial_connection
-				if serial_connection != None:
+				temp = serial_connection
+				if temp != None:
+					global serial_connection
 					serial_connection.close()
+				global serial_connection
 				serial_connection = None
+				global serial_connection
 				serial_connection = Connection(node['address'], BLUE_RATE)
 			if node.get('address', None) != None:
 				return {'node' : marshal(node, NodesAPI.node_field_address)} 

@@ -106,15 +106,17 @@ angular.module('flagular')
           }, $scope.newSensorRefesh);
           requests[data.sensor.id] = request;
         }
+        usedPins.push(data.sensor.pin);
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = 'None';
-        if(board == 'Arduino Uno')
-          $scope.newSensorPin = 'None';
-        else
-          $scope.newSensorPin = '';
         $scope.newSensorDirection = 'None';
         $scope.newSensorRefesh = '';
+        if(board == 'Arduino Uno') {
+          $scope.newSensorPin = 'None';
+          loadPinListForArduinoSignal('');
+        } else
+          $scope.newSensorPin = '';
       });
     } else
       $scope.newSensor = true;

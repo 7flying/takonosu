@@ -59,6 +59,7 @@ def populate():
 		node[N_SENSORS] = sensors
 		insert_node(node)
 	"""
+	"""
 	node = {}
 	node[N_NAME] = "Testing Node "
 	node[N_BOARD] = 'Arduino Uno'
@@ -72,6 +73,7 @@ def populate():
 	sensor[S_DIRECTION] = 'W'
 	sensor[S_REFRESH] = '1000'
 	"""
+	"""
 	sensor2 = {}
 	sensor2[S_NAME] = 'TESTING sensor2'
 	sensor2[S_SIGNAL] = 'A'
@@ -80,11 +82,12 @@ def populate():
 	sensor2[S_REFRESH] = 10000
 	sensors.append(sensor2)
 	"""
+	"""
 	sensors.append(sensor)
 	node[N_SENSORS] = sensors
 	insert_node(node)
 	print "[ MANAGER ]: Test data added."
-	
+	"""
 
 ## Keys ##
 
@@ -165,7 +168,8 @@ def _get_node(node_id):
 def get_nodes():
 	""" Returns every node and sensor in the db. """
 	ret = []
-	max_id = int(db.get(KEY_AUTO_NODE_ID))
+	max_id = 0 if db.get(KEY_AUTO_NODE_ID) == None \
+		or len(db.get(KEY_AUTO_NODE_ID)) == 0 else int(db.get(KEY_AUTO_NODE_ID))
 	for i in range(1, max_id + 1):
 		node = get_node(i)
 		if node:

@@ -16,7 +16,7 @@ import redis
 import manager
 import nic
 import Queue
-from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_PORT, BLUE_RATE
+from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_RATE
 from connection import Connection
 
 # Restful api
@@ -25,10 +25,15 @@ api = Api(app)
 # Redis database
 db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+# Connections
 pool = ThreadPool(processes=3)
+
 # Serial port management
-serial_connections = {}
-serial_connections[BLUE_PORT] = Connection(BLUE_PORT, BLUE_RATE)
+serial_connection = None
+
+# Constants
+BLUETOOTH = 'Bluetooth'
+WIFI = 'Wifi'
 
 
 class DataAPI(Resource):
@@ -66,12 +71,10 @@ class DataAPI(Resource):
 				if sensor == None:
 					abort(404)
 				else:
-					if node['nic'] == 'ZigBee':
-						print "en ZigBee"
-					elif node['nic'] == 'Bluetooth':
-						if serial_connections.get(BLUE_PORT, None) == None:
-							serial_connections[BLUE_PORT] = Connection(
-								BLUE_PORT, BLUE_RATE)
+					if node['nic'] == BLUETOOTH:
+						if serial_connection == None:
+							serial_connection = Connection(node['address'],
+								BLUE_RATE)
 						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 						command = 'R' + sensor['signal'] + pin + 'X'
 						ret = {}
@@ -79,23 +82,23 @@ class DataAPI(Resource):
 						# Option 1
 						async_result = pool.apply_async(
 							nic.serial_read,
-							(command, serial_connections[BLUE_PORT]))
+							(command, serial_connection))
 						ret['value'] = async_result.get(timeout=1)
 						# Option 2
 						"""
 						queue = Queue.Queue()
 						t = Thread(target=serial_read,
 							args=(command,
-								serial_connections[BLUE_PORT], queue))
+								serial_connection, queue))
 						t.start()
 						result = queue.get()
 						ret['value'] = result
 						"""
 						return {'data': marshal(ret, DataAPI.data_field)}	
-					elif node['nic'] == 'Wifi':
-						print "GET DATA pin: ", node['ip']
+					elif node['nic'] == WIFI:
+						print "GET DATA pin: ", node['address']
 						print "GET DATA pin: ", sensor['pin']
-						ip = node['ip']
+						ip = node['address']
 						data = {}
 						data['value'] = nic.gpio_read(sensor['pin'], ip)
 						data['unit'] = " "
@@ -121,27 +124,22 @@ class DataAPI(Resource):
 				if sensor == None:
 					abort(404)
 				else:
-					port = BLUE_PORT
-					rate = BLUE_RATE
-					if node['nic'] == 'ZigBee':
-						pass
-					elif node['nic'] == 'Bluetooth':
-						if serial_connections.get(BLUE_PORT, None) == None:
-							serial_connections[BLUE_PORT] = Connection(
-								BLUE_PORT, BLUE_RATE)
+					if node['nic'] == BLUETOOTH:
+						if serial_connection == None:
+							serial_connection = Connection(
+								node['address'], BLUE_RATE)
 						pin = sensor['pin'] if len(sensor['pin']) > 1 else '0' + sensor['pin']
 						command = 'W' + sensor['signal'] + pin + args['data'] + 'X'
 						thread = Thread(target=nic.serial_write,
-							args=(command, serial_connections[BLUE_PORT]))
+							args=(command, serial_connection))
 						thread.start()
-					elif node['nic'] == 'Wifi':
-						ip = node['ip']
+					elif node['nic'] == WIFI:
+						ip = node['address']
 						pin = sensor['pin']
 						data = args['data']
 						thread = Thread(target=nic.gpio_write,
 							args=(pin, ip, data))
 						thread.start()
-
 
 api.add_resource(DataAPI, '/takonosu/api/data', endpoint='data')
 
@@ -200,12 +198,12 @@ class NodesAPI(Resource):
 		'sensors' : fields.List(fields.Nested(SensorAPI.sensor_field)) 
 	}
 
-	node_field_ip = {
+	node_field_address = {
 		'id': fields.Integer,
 		'name':fields.String,
 		'board_type': fields.String,
 		'nic': fields.String,
-		'ip': fields.String,
+		'address': fields.String,
 		'sensors' : fields.List(fields.Nested(SensorAPI.sensor_field)) 
 	}
 
@@ -215,7 +213,7 @@ class NodesAPI(Resource):
 		self.reqparse.add_argument('name', type=str)
 		self.reqparse.add_argument('board_type', type=str)
 		self.reqparse.add_argument('nic', type=str)
-		self.reqparse.add_argument('ip', type=str)
+		self.reqparse.add_argument('address', type=str)
 		super(NodesAPI, self).__init__()
 
 	def get(self):
@@ -224,14 +222,23 @@ class NodesAPI(Resource):
 		if args['id'] == None: # We want al the nodes
 			nodes = manager.get_nodes()
 			return jsonify(nodes=nodes)
-		elif args['id'] != None:
+		elif args['id'] != None: 
+			# We usually want to pair with this node if it has bluetooth
 			node = manager.get_node(args['id'])
-			if node.get('ip', None) != None:
-				return {'node' : marshal(node, NodesAPI.node_field_ip)} 
+			if node['nic'] == BLUETOOTH:
+				# Unpair the last one
+				global serial_connection
+				if serial_connection != None:
+					serial_connection.close()
+				serial_connection = None
+				serial_connection = Connection(node['address'], BLUE_RATE)
+			if node.get('address', None) != None:
+				return {'node' : marshal(node, NodesAPI.node_field_address)} 
 			else:
 				return {'node' : marshal(node, NodesAPI.node_field)}
 		else:
-			abort(400)	
+			abort(400)
+
 	def post(self):
 		""" Creates a new node."""
 		args = self.reqparse.parse_args()
@@ -239,13 +246,13 @@ class NodesAPI(Resource):
 		node['name'] = args['name']
 		node['board_type'] = args['board_type']
 		node['nic'] = args['nic']
-		if args.get('ip', None) != None:
-			node['ip'] = args['ip']
+		if args.get('address', None) != None:
+			node['address'] = args['address']
 		node['sensors'] = []
 		result = manager.insert_node(node)
 		created = manager.get_node(result)
-		if created.get('ip', None) != None:
-			return {'node' : marshal(created, NodesAPI.node_field_ip)}	
+		if created.get('address', None) != None:
+			return {'node' : marshal(created, NodesAPI.node_field_address)}	
 		else:
 			return {'node' : marshal(created, NodesAPI.node_field)}
 
@@ -258,8 +265,8 @@ class NodesAPI(Resource):
 			node['name'] = args['name']
 			node['board_type'] = args['board_type']
 			node['nic'] = args['nic']
-			if args.get('ip', None) != None:
-				node['ip'] = args['ip']
+			if args.get('address', None) != None:
+				node['address'] = args['address']
 			result = manager.modify_node(node)
 			if result:
 				return jsonify(message="Node modified", code=201)
@@ -292,7 +299,7 @@ class NodeSensorsAPI(Resource):
 		self.reqparse.add_argument('signal', type=str)
 		self.reqparse.add_argument('pin', type=int)
 		self.reqparse.add_argument('direction', type=str)
-		self.reqparse.add_argument('refresh', type=str)
+		self.reqparse.add_argument('refresh', type=int)
 		super(NodeSensorsAPI, self).__init__()
 
 	def get(self):

@@ -12,7 +12,7 @@
                             <tr>
                                 <th>Board</th>
                                 <th>Network Interface Controller</th>
-                                <th ng-show="newNodeNic == 'Wifi'">Address</th>
+                                <th>Address</th>
                                 <th># Sensors</th>
                             </tr>
                             <tr>
@@ -28,7 +28,7 @@
                                             </ul>
                                     </div>
                                 <td>{{newNodeNic}}</td>
-                                <td ng-show="newNodeNic == 'Wifi'"><input value="{{node.address}}" type="text" class="form-control" placeholder="e.g. 192.168.1.130" ng-model="newNodeAddress"></td>
+                                <td><input value="{{node.address}}" type="text" class="form-control" placeholder="Address" ng-model="newNodeAddress"></td>
                                 <td>0</td>
                             </tr>
                         </table>
@@ -48,13 +48,13 @@
                             <tr>
                                 <th>Board</th>
                                 <th>Network Interface Controller</th>
-                                <th ng-show="node.nic == 'Wifi'">Address</th>
+                                <th>Address</th>
                                 <th ui-sref="sensor({ id: node.id })"># Sensors</th>
                             </tr>
                             <tr>
                                 <td>{{node.board_type}}</td>
                                 <td>{{node.nic}}</td>
-                                <td ng-show="node.nic == 'Wifi'">{{node.address}}</td>
+                                <td>{{node.address}}</td>
                                 <td ui-sref="sensor({ id: node.id })">{{node.sensors.length}}</td>
                             </tr>
                         </table>
@@ -68,7 +68,7 @@
                                     <tr>
                                         <th>Board</th>
                                         <th>Network Interface Controller</th>
-                                        <th ng-show="node.nic == 'Wifi'">Address</th>
+                                        <th>Address</th>
                                         <th># Sensors</th>
                                     </tr>
                                     <tr>

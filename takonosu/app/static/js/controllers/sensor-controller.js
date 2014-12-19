@@ -33,10 +33,12 @@ angular.module('flagular')
     $scope.newSensorDirection = directionName;
     if(directionName == $scope.directionList[0]) {
       directionSelection = 'R';
-      loadPinListForArduinoDirection();
+      if(board == 'Arduino Uno')
+        loadPinListForArduinoDirection();
     } else {
       directionSelection = 'W';
-      loadPinListForArduinoDirection();
+      if(board == 'Arduino Uno')
+        loadPinListForArduinoDirection();
     }
   }
 
@@ -54,13 +56,18 @@ angular.module('flagular')
   }
 
   $scope.sendData = function(sensor) {
-    SensorData.sendData({
-      'node': $stateParams.id,
-      'sensor': sensor.id,
-      'data': sensor.out
-    }, function() {
-      sensor.out = '';
-    });
+    if(!(typeof sensor.out === 'undefined') && sensor.out != '' ) {
+      SensorData.sendData({
+        'node': $stateParams.id,
+        'sensor': sensor.id,
+        'data': sensor.out
+      }, function() {
+        sensor.out = '';
+        sensor.error_message = '';
+      });
+    } else {
+        sensor.error_message = 'Cannot send empty data.'
+    }
   }
 
   $scope.updateSensor = function(sensor) {
@@ -102,7 +109,10 @@ angular.module('flagular')
         $scope.sensors.push(data.sensor);
         $scope.newSensorName = '';
         $scope.newSensorSignal = 'None';
-        $scope.newSensorPin = 'None';
+        if(board == 'Arduino Uno')
+          $scope.newSensorPin = 'None';
+        else
+          $scope.newSensorPin = '';
         $scope.newSensorDirection = 'None';
         $scope.newSensorRefesh = '';
       });
@@ -137,7 +147,6 @@ angular.module('flagular')
         $scope.newSensor = true;
     } else {
       angular.forEach(data.node.sensors, function(sensor) {
-        console.log(sensor.pin);
         usedPins.push(sensor.pin);
         makeSensorUserfriendly(sensor);
         sensor.edit = false;
@@ -155,8 +164,9 @@ angular.module('flagular')
         if(sensor.direction == $scope.directionList[0])
           requests[sensor.id] = request;
       });
+    } if(board == 'Arduino Uno') {
+      loadPinListForArduinoSignal('');
     }
-    loadPinListForArduinoSignal('');
   });
 
   function loadPinList(limit) {

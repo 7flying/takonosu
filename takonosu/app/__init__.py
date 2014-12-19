@@ -28,7 +28,7 @@ db = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 pool = ThreadPool(processes=3)
 # Serial port management
 serial_connections = {}
-#serial_connections[BLUE_PORT] = Connection(BLUE_PORT, BLUE_RATE)
+serial_connections[BLUE_PORT] = Connection(BLUE_PORT, BLUE_RATE)
 
 
 class DataAPI(Resource):

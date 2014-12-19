@@ -206,7 +206,7 @@ def _insert_sensor(sensor):
 	db.hset(KEY_SENSORS + id, S_SIGNAL, sensor[S_SIGNAL])
 	db.hset(KEY_SENSORS + id, S_PIN, str(sensor[S_PIN]))
 	db.hset(KEY_SENSORS + id, S_DIRECTION, sensor[S_DIRECTION])
-	if sensor.get(S_REFRESH, None) != None and len(sensor[S_REFRESH]) > 0:
+	if sensor.get(S_REFRESH, None) != None and len(str(sensor[S_REFRESH])) > 0:
 		db.hset(KEY_SENSORS + id, S_REFRESH, str(sensor[S_REFRESH]))
 	return id
 

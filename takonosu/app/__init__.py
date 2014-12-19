@@ -160,7 +160,7 @@ class SensorAPI(Resource):
 		'signal' : fields.String, # Analog or digital
 		'pin': fields.Integer, # To witch pin it is connected
 		'direction': fields.String, # Read or write
-		'refresh': fields.Integer # Ignore if unnecessary
+		'refresh': fields.String # Ignore if unnecessary
 	}
 
 	def __init__(self):

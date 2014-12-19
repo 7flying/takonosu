@@ -69,7 +69,7 @@ def populate():
 	sensor[S_SIGNAL] = 'D'
 	sensor[S_PIN] = '7'
 	sensor[S_DIRECTION] = 'W'
-	sensor[S_REFRESH] = 1000
+	sensor[S_REFRESH] = '1000'
 	"""
 	sensor2 = {}
 	sensor2[S_NAME] = 'TESTING sensor2'
@@ -201,7 +201,8 @@ def _insert_sensor(sensor):
 	db.hset(KEY_SENSORS + id, S_SIGNAL, sensor[S_SIGNAL])
 	db.hset(KEY_SENSORS + id, S_PIN, str(sensor[S_PIN]))
 	db.hset(KEY_SENSORS + id, S_DIRECTION, sensor[S_DIRECTION])
-	db.hset(KEY_SENSORS + id, S_REFRESH, str(sensor[S_REFRESH]))
+	if sensor.get(S_REFRESH, None) != None and len(sensor[S_REFRESH]) > 0:
+		db.hset(KEY_SENSORS + id, S_REFRESH, str(sensor[S_REFRESH]))
 	return id
 
 def insert_sensor_to_node(node_id, sensor):

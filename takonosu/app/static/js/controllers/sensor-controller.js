@@ -92,11 +92,18 @@ angular.module('flagular')
     }
   }
 
+  function checkPinFilled() {
+    if((typeof $scope.newSensorPin !== 'undefined')) {
+      return $scope.newSensorPin.length;
+    } else {
+      return false;
+    }
+  }
+
   function checkBasicData() {
     return ((typeof $scope.newSensorName !== 'undefined') && $scope.newSensorName.length
           && $scope.newSensorSignal != 'None'
-          && $scope.newSensorDirection != 'None'
-          && !isNaN($scope.newSensorPin));
+          && $scope.newSensorDirection != 'None');
   }
 
   function sendSensor() {
@@ -144,10 +151,17 @@ angular.module('flagular')
       if(checkBasicData()) {
         if($scope.newSensorDirection ==  $scope.directionList[0]) {
           if(checkReadFilled()) {
-            if(!isNaN($scope.newSensorRefesh)) {
+            if(checkPinFilled() && !isNaN($scope.newSensorRefesh) && !isNaN($scope.newSensorPin)) {
               sendSensor();
             } else {
               $scope.showError = false;
+              if(checkPinFilled() && isNaN($scope.newSensorRefesh) && isNaN($scope.newSensorPin)) {
+                $scope.field = 'Pin & Rate';
+              } else if(checkPinFilled() && !isNaN($scope.newSensorRefesh) && isNaN($scope.newSensorPin)) {
+                $scope.field = 'Pin';
+              } else if(checkPinFilled() && isNaN($scope.newSensorRefesh) && !isNaN($scope.newSensorPin)){
+                $scope.field = 'Rate';
+              }
               $scope.showNumError = true;
             }
           } else {
@@ -155,7 +169,13 @@ angular.module('flagular')
             $scope.showNumError = false;
           }
         } else {
-          sendSensor();
+          if(checkPinFilled() && !isNaN($scope.newSensorPin)) {
+            sendSensor();
+          } else {
+            $scope.showError = false;
+            $scope.field = 'Pin';
+            $scope.showNumError = true;
+          }
         }
       } else {
         $scope.showError = true;

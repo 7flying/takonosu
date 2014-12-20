@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __init__ import db
 import random
+from etc import debug
 
 ## DB-Keys ##
 
@@ -28,6 +29,8 @@ S_DIRECTION = 'direction'
 S_REFRESH	= 'refresh'
 
 ##########
+
+CODE = 'MANAGER'
 
 # Nota: A Sesma le molesta que AD se llame AD, depende de como me de el aire
 # cambiamos AD a signal o no.
@@ -117,16 +120,19 @@ def insert_node(node):
 	If the node has sensors they are also inserted.
 	Returns the new node's id
 	"""
+	debug(CODE, "INSERT NODE: (node): " + str(node))
 	id = _increment_key_node()
+	debug(CODE, "INSERT NODE: assigned id: " + str(id))
 	db.hset(KEY_NODES + id, N_ID, id)
 	db.hset(KEY_NODES + id, N_NAME, node[N_NAME])
 	db.hset(KEY_NODES + id, N_BOARD, node[N_BOARD])
 	db.hset(KEY_NODES + id, N_NIC, node[N_NIC])
 	db.hset(KEY_NODES + id, N_SENSORS, id)
 	if node.get(N_ADDR, None) != None:
-		print "ip no none"
+		debug(CODE, "INSERT NODE: The node has an address")
 		db.hset(KEY_NODES + id, N_ADDR, node[N_ADDR])
 	if node.get(N_SENSORS) != None:
+		debug(CODE, "INSERT NODE: The node has sensors")
 		for sensor in node[N_SENSORS]:
 			insert_sensor_to_node(id, sensor)
 	return id
@@ -135,6 +141,7 @@ def delete_node(id):
 	"""
 	Deletes a node from the db as well as all the sensors related to the node.
 	"""
+	debug(CODE, "DELETE NODE: (id): " + str(id))
 	id = str(id)
 	sensors = set(db.smembers(KEY_LIST_SENSORS_IN_NODE + id))
 	for id_sensor in sensors:
@@ -153,12 +160,15 @@ def modify_node(new_node):
 
 def get_node(node_id):
 	""" Returns the node given the id, as well as all its sensors. """
+	debug(CODE, "GET NODE: (id): " + str(node_id))
 	node = db.hgetall(KEY_NODES + str(node_id))
 	sensors = get_sensors(node_id)
 	if sensors and len(sensors) > 0:
+		debug(CODE, "GET NODE: The node has sensors")
 		node[N_SENSORS] = sensors
 	elif node:
 		node[N_SENSORS] = []
+	debug(CODE, "GET NODE: (return): " + str(node))
 	return node
 
 def _get_node(node_id):
@@ -167,9 +177,11 @@ def _get_node(node_id):
 
 def get_nodes():
 	""" Returns every node and sensor in the db. """
+	debug(CODE, "GET NODES")
 	ret = []
 	max_id = 0 if db.get(KEY_AUTO_NODE_ID) == None \
 		or len(db.get(KEY_AUTO_NODE_ID)) == 0 else int(db.get(KEY_AUTO_NODE_ID))
+	debug(CODE, "GET NODES max_id:" + str(max_id))	
 	for i in range(1, max_id + 1):
 		node = get_node(i)
 		if node:
@@ -181,7 +193,7 @@ def get_sensors(node_id):
 	sensors = []
 	for sensor_id in db.smembers(KEY_LIST_SENSORS_IN_NODE + str(node_id)):
 		sensor = get_sensor(sensor_id)
-		if sensor['id'] == 0:
+		if sensor[S_ID] == 0:
 			sensor = None
 		if sensor != None:
 			sensors.append(sensor)
@@ -189,10 +201,13 @@ def get_sensors(node_id):
 
 def get_sensor(sensor_id):
 	""" Gets a sensor given its id. """
+	debug(CODE, "GET SENSOR: params (id):" + str(sensor_id))
 	data = db.hgetall(KEY_SENSORS + str(sensor_id))
-	if data.get('id', None) == None:
+	if data.get(S_ID, None) == None:
+		debug(CODE, "GET SENSOR: return None")
 		return None
 	else:
+		debug(CODE, "GET SENSOR: return: " + str(data))	
 		return data
 
 def _insert_sensor(sensor):
@@ -200,7 +215,9 @@ def _insert_sensor(sensor):
 	Inserts a sensor to the db.
 	Returns the new generated id for the sensor.
 	"""
+	debug(CODE, "INSERT SENSOR: params (sensor):" + str(sensor))
 	id = _increment_key_sensor()
+	debug(CODE, "INSERT SENSOR: generated id:" + str(id))
 	db.hset(KEY_SENSORS + id, S_ID, id)
 	db.hset(KEY_SENSORS + id, S_NAME, sensor[S_NAME])
 	db.hset(KEY_SENSORS + id, S_SIGNAL, sensor[S_SIGNAL])
@@ -212,6 +229,8 @@ def _insert_sensor(sensor):
 
 def insert_sensor_to_node(node_id, sensor):
 	""" Adds a new sensor to the node. """
+	debug(CODE, "INSERT SENSOR TO NODE: params (node_id, sensor):" + \
+		str(node_id) + " " + str(sensor))
 	sensor_id = _insert_sensor(sensor)
 	db.sadd(KEY_LIST_SENSORS_IN_NODE + str(node_id), sensor_id)
 	return sensor_id

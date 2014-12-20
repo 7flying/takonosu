@@ -10,3 +10,6 @@ BLUE_RATE = '115200'
 
 # Sockets
 S_PORT = 5432
+
+# Global settings
+DEBUG = True

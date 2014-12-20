@@ -15,9 +15,9 @@ from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 import redis
 import manager
 import nic
-import Queue
 from config import REDIS_HOST, REDIS_PORT, REDIS_DB, BLUE_RATE
 from connection import Connection
+from etc import debug
 
 # Restful api
 api = Api(app)
@@ -72,8 +72,8 @@ class DataAPI(Resource):
 					abort(404)
 				else:
 					if node['nic'] == BLUETOOTH:
-						global serial_connection
-						if serial_connection == None:
+						temp = serial_connection
+						if temp == None:
 							global serial_connection
 							serial_connection = Connection(node['address'],
 								BLUE_RATE)
@@ -89,6 +89,7 @@ class DataAPI(Resource):
 						ret['value'] = async_result.get(timeout=1)
 						# Option 2
 						"""
+						# remember to import Queue
 						queue = Queue.Queue()
 						t = Thread(target=serial_read,
 							args=(command,
@@ -130,8 +131,7 @@ class DataAPI(Resource):
 					if node['nic'] == BLUETOOTH:
 						global serial_connection
 						temp = serial_connection
-						global serial_connection
-						if serial_connection == None:
+						if temp == None:
 							global serial_connection
 							serial_connection = Connection(
 								node['address'], BLUE_RATE)

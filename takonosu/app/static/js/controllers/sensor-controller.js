@@ -94,7 +94,11 @@ angular.module('flagular')
 
   function checkPinFilled() {
     if((typeof $scope.newSensorPin !== 'undefined')) {
-      return $scope.newSensorPin.length;
+      if(board == 'Arduino Uno') {
+        return !isNaN($scope.newSensorPin);
+      } else { 
+        return $scope.newSensorPin.length;
+      }
     } else {
       return false;
     }

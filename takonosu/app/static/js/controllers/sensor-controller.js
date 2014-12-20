@@ -110,15 +110,27 @@ angular.module('flagular')
           && $scope.newSensorDirection != 'None');
   }
 
-  function sendSensor() {
-    Node.createSensor({
-      "id": $stateParams.id,
-      "name": $scope.newSensorName,
-      "signal": signalSelection,
-      "pin": $scope.newSensorPin,
-      "direction": directionSelection,
-      "refresh": $scope.newSensorRefesh
-    }, function (data) {
+  function sendSensor(direction) {
+    var params = null;
+    if (direction == 0){ // Read
+      params = {
+        "id": $stateParams.id,
+        "name": $scope.newSensorName,
+        "signal": signalSelection,
+        "pin": $scope.newSensorPin,
+        "direction": directionSelection,
+        "refresh": $scope.newSensorRefesh 
+      };
+    } else {
+      params = {
+        "id": $stateParams.id,
+        "name": $scope.newSensorName,
+        "signal": signalSelection,
+        "pin": $scope.newSensorPin,
+        "direction": directionSelection 
+      };
+    } 
+    Node.createSensor(params, function (data) {
       makeSensorUserfriendly(data.sensor);
       $scope.newSensor = false;
       $scope.showError = false;
@@ -156,7 +168,7 @@ angular.module('flagular')
         if($scope.newSensorDirection ==  $scope.directionList[0]) {
           if(checkReadFilled()) {
             if(checkPinFilled() && !isNaN($scope.newSensorRefesh) && !isNaN($scope.newSensorPin)) {
-              sendSensor();
+              sendSensor(0);
             } else {
               $scope.showError = false;
               if(checkPinFilled() && isNaN($scope.newSensorRefesh) && isNaN($scope.newSensorPin)) {
@@ -174,7 +186,7 @@ angular.module('flagular')
           }
         } else {
           if(checkPinFilled() && !isNaN($scope.newSensorPin)) {
-            sendSensor();
+            sendSensor(1);
           } else {
             $scope.showError = false;
             $scope.field = 'Pin';

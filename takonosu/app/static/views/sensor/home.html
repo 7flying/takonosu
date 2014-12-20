@@ -48,6 +48,9 @@
                                 <td ng-show="newSensorDirection == directionList[0]"><input type="text" class="form-control" placeholder="Rate" ng-model="newSensorRefesh"></td>
                             </tr>
                         </table>
+                        <div ng-show="showNumError" class="alert alert-danger alert-dismissible" role="alert">
+                            <strong>Error!</strong> Rate must be numeric.
+                        </div>
                         <div ng-show="showError" class="alert alert-danger alert-dismissible" role="alert">
                             <strong>Error!</strong> Cannot create empty sensor.
                         </div>

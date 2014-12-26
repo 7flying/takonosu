@@ -341,7 +341,7 @@ class NodeSensorsAPI(Resource):
 
 	def delete(self):
 		""" Deletes a sensor from a node. """
-		args =  self.reqparse.parse_args()
+		args = self.reqparse.parse_args()
 		if args['id'] != None and args['sensor_id'] != None:
 			manager.delete_sensor_from_node(args['id'], args['sensor_id'])
 			return jsonify(message="Sensor deleted from node", code=201)

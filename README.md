@@ -1,6 +1,4 @@
 Takonosu - 蛸の巣
 =================
 
-WORK IN PROGRESS
-
-Takonosu - 蛸の巣 - Nest of octopus
+Takonosu (蛸の巣, Nest of octopus), is a sensor network manager developed for the Embedded Systems subject.
